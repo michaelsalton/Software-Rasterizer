@@ -1,0 +1,22 @@
+﻿  Renderer.cpp
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(74,43): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(74,40): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(79,16): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(80,53): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(80,47): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(80,41): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(80,35): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(81,54): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(81,48): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(81,42): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(81,36): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(86,16): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(87,53): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(87,47): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(87,41): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(87,35): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(88,54): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(88,48): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(88,42): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\projects\SoftwareRasterizer\SoftwareRasterizer\Renderer.cpp(88,36): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  SoftwareRasterizer.vcxproj -> D:\projects\SoftwareRasterizer\x64\Debug\SoftwareRasterizer.exe
