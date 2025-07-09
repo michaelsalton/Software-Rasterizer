@@ -1,45 +1,80 @@
-# Visual Studio & Build Files
+# Build files
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# Executable
+SoftwareRasterizer
+tests/RunAllTests
+
+# IDE files
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+.vs/
+
+# Visual Studio files
 *.sdf
 *.opensdf
 *.suo
 *.user
 *.VC.db
 *.VC.opendb
-
-# Linux/Unix executables and build files
-SoftwareRasterizer/SoftwareRasterizer
-*.o
-*.a
-*.so
-Makefile.bak
-
-# Compiled binaries
-Debug/
-Release/
 *.obj
-*.exe
-*.dll
 *.pdb
 *.ilk
 *.idb
 *.lib
 *.exp
+*.tlog
+*.ipch
 
-# NuGet & Package files
+# OS files
+.DS_Store
+Thumbs.db
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Dependency files
+*.d
+
+# Test coverage
+*.gcda
+*.gcno
+*.gcov
+
+# Core dumps
+core
+core.*
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Build directories
+Debug/
+Release/
+build/
+cmake-build-*/
+
+# Package files
 packages/
 *.nupkg
 project.lock.json
 
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
 
 # Precompiled Headers
 *.gch
@@ -64,12 +99,3 @@ project.lock.json
 *.exe
 *.out
 *.app
-
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-
-.vs/
-
-*.tlog
-*.ipch

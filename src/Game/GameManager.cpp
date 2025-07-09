@@ -1,5 +1,5 @@
 #include "GameManager.h"
-#include "../Math/Vector3.h"
+#include "../Math/Vec3.h"
 
 GameManager* GameManager::sInstance = NULL;
 
@@ -59,8 +59,8 @@ void GameManager::Run()
 
 
 
-			mRenderer->DrawFilledTriangle(Vector3(0, 0, 0), Vector3(-50, -50, -50), Vector3(-100, -150, -150), { 0, 255, 0, 255 });
-			mRenderer->DrawLine(Vector3(0, 0, 0), Vector3(200, 200, 200), { 255, 0, 0, 255 });
+			mRenderer->DrawFilledTriangle(Vec3(0, 0, 0), Vec3(-50, -50, -50), Vec3(-100, -150, -150), { 0, 255, 0, 255 });
+			mRenderer->DrawLine(Vec3(0, 0, 0), Vec3(200, 200, 200), { 255, 0, 0, 255 });
 
 
 

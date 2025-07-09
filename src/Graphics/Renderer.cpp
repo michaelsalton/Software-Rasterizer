@@ -7,7 +7,7 @@ Renderer::Renderer(SDL_Renderer* renderer) : mRenderer(renderer) {}
 
 Renderer::~Renderer() {}
 
-Vector3 Renderer::Project(Vector3 point, float fov, float aspectRatio, float near, float far)
+Vec3 Renderer::Project(Vec3 point, float fov, float aspectRatio, float near, float far)
 {
     if (point.z == 0)
     {
@@ -24,25 +24,25 @@ Vector3 Renderer::Project(Vector3 point, float fov, float aspectRatio, float nea
     projectedX = std::min(std::max(projectedX, 0.0f), (float)Graphics::WINDOW_WIDTH - 1);
     projectedY = std::min(std::max(projectedY, 0.0f), (float)Graphics::WINDOW_HEIGHT - 1);
 
-    return Vector3(projectedX, projectedY, point.z);
+    return Vec3(projectedX, projectedY, point.z);
 }
 
-void Renderer::DrawPoint(Vector3 point, SDL_Color color)
+void Renderer::DrawPoint(Vec3 point, SDL_Color color)
 {
-    Vector3 projected = Project(point, 1.0f, 1.0f, 0.1f, 100.0f);
+    Vec3 projected = Project(point, 1.0f, 1.0f, 0.1f, 100.0f);
     SDL_SetRenderDrawColor(mRenderer, color.r, color.g, color.b, color.a);
     SDL_RenderPoint(mRenderer, projected.x, projected.y);
 }
 
-void Renderer::DrawLine(Vector3 v1, Vector3 v2, SDL_Color color)
+void Renderer::DrawLine(Vec3 v1, Vec3 v2, SDL_Color color)
 {
-    Vector3 projected1 = Project(v1, 1.0f, 1.0f, 0.1f, 100.0f);
-    Vector3 projected2 = Project(v2, 1.0f, 1.0f, 0.1f, 100.0f);
+    Vec3 projected1 = Project(v1, 1.0f, 1.0f, 0.1f, 100.0f);
+    Vec3 projected2 = Project(v2, 1.0f, 1.0f, 0.1f, 100.0f);
     SDL_SetRenderDrawColor(mRenderer, color.r, color.g, color.b, color.a);
     SDL_RenderLine(mRenderer, projected1.x, projected1.y, projected2.x, projected2.y);
 }
 
-void Renderer::DrawTriangle(Vector3 v1, Vector3 v2, Vector3 v3, SDL_Color color)
+void Renderer::DrawTriangle(Vec3 v1, Vec3 v2, Vec3 v3, SDL_Color color)
 {
 	SDL_SetRenderDrawColor(mRenderer, color.r, color.g, color.b, color.a);
 	SDL_RenderLine(mRenderer, v1.x, v1.y, v2.x, v2.y);
@@ -50,7 +50,7 @@ void Renderer::DrawTriangle(Vector3 v1, Vector3 v2, Vector3 v3, SDL_Color color)
 	SDL_RenderLine(mRenderer, v3.x, v3.y, v1.x, v1.y);
 }
 
-void Renderer::DrawFilledTriangle(Vector3 v1, Vector3 v2, Vector3 v3, SDL_Color color)
+void Renderer::DrawFilledTriangle(Vec3 v1, Vec3 v2, Vec3 v3, SDL_Color color)
 {
     // Sort vertices by Y-coordinate (ascending)
     if (v1.y > v2.y) std::swap(v1, v2);
@@ -58,9 +58,9 @@ void Renderer::DrawFilledTriangle(Vector3 v1, Vector3 v2, Vector3 v3, SDL_Color 
     if (v1.y > v2.y) std::swap(v1, v2);
 
     // Project the vertices into 2D space
-    Vector3 p1 = Project(v1, 1.0f, 1.0f, 0.1f, 100.0f);
-    Vector3 p2 = Project(v2, 1.0f, 1.0f, 0.1f, 100.0f);
-    Vector3 p3 = Project(v3, 1.0f, 1.0f, 0.1f, 100.0f);
+    Vec3 p1 = Project(v1, 1.0f, 1.0f, 0.1f, 100.0f);
+    Vec3 p2 = Project(v2, 1.0f, 1.0f, 0.1f, 100.0f);
+    Vec3 p3 = Project(v3, 1.0f, 1.0f, 0.1f, 100.0f);
 
     std::cout << "p1: " << p1.x << ", " << p1.y << std::endl;
     std::cout << "p2: " << p2.x << ", " << p2.y << std::endl;

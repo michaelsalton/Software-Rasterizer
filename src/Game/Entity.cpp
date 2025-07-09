@@ -15,18 +15,19 @@ Entity::~Entity()
 	mParent = NULL;
 }
 
-void Entity::Position(Vector3 position)
+void Entity::Position(Vec3 position)
 {
 	mPosition = position;
 }
 
-Vector3 Entity::Position(SPACE space)
+Vec3 Entity::Position(SPACE space)
 {
 	if (space == local || mParent == NULL)
 	{
 		return mPosition;
 	}
-	return mParent->Position(world) + RotateVector(mPosition, mParent->Rotation(local));
+	Vec2 rotated = Math::rotate(Vec2(mPosition.x, mPosition.y), Math::toRadians(mParent->Rotation(local)));
+	return mParent->Position(world) + Vec3(rotated.x, rotated.y, mPosition.z);
 }
 
 void Entity::Rotation(float rotation)

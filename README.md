@@ -1,35 +1,33 @@
 # Software Rasterizer
 
-A 3D software rasterizer built from scratch in C++ using SDL3 for window management and 2D operations. This project implements fundamental 3D graphics concepts including perspective projection, primitive rendering, and custom triangle rasterization algorithms.
-
-## Features
-
-- **3D Perspective Projection**: Transforms 3D coordinates to 2D screen space with configurable FOV, aspect ratio, and near/far planes
-- **Custom Triangle Rasterization**: Implements scanline-based filled triangle rendering algorithm
-- **Primitive Rendering**: Support for points, lines, and triangles (both wireframe and filled)
-- **Scene Graph**: Entity system with hierarchical parent-child relationships
-- **Frame Rate Control**: Runs at a smooth 60 FPS with proper timing utilities
+A 3D software rasterizer implementation from scratch using C++ and SDL3.
 
 ## Project Structure
 
 ```
-SoftwareRasterizer/
-├── Core/           # Main entry point
-│   └── Main.cpp
-├── Graphics/       # Rendering systems
-│   ├── Graphics.cpp/h    # SDL window/context management
-│   └── Renderer.cpp/h    # 3D projection and rasterization
-├── Math/           # Mathematics utilities
-│   ├── MathHelper.cpp/h  # Math utilities and rotations
-│   └── Vector3.h         # 3D vector implementation
-├── Game/           # Game framework
-│   ├── Entity.cpp/h      # Base entity class
-│   └── GameManager.cpp/h # Main game loop
-├── Utils/          # Utility classes
-│   ├── InputManager.cpp/h # Input handling
-│   └── Timer.cpp/h        # Frame timing
-└── Makefile        # Build configuration
+Software-Rasterizer/
+├── src/                    # Source code
+│   ├── Core/              # Main application and entry point
+│   ├── Game/              # Game logic and entities
+│   ├── Graphics/          # Rendering and graphics
+│   ├── Math/              # Mathematical utilities (vectors, matrices)
+│   └── Utils/             # Utility classes (Timer, InputManager)
+├── tests/                  # Unit tests
+│   ├── Math/              # Math library tests
+│   └── TestFramework.h    # Testing framework
+├── Makefile               # Build configuration
+└── README.md              # This file
 ```
+
+## Features
+
+- **3D Math Library**: Comprehensive vector (Vec2, Vec3, Vec4) and matrix (Mat4) classes
+- **Software Rendering**: Triangle rasterization without GPU acceleration
+- **Entity System**: Basic game entity management with hierarchical transforms
+- **Cross-platform**: Works on Linux with SDL3
+- **3D Perspective Projection**: Transforms 3D coordinates to 2D screen space
+- **Primitive Rendering**: Support for points, lines, and triangles
+- **Frame Rate Control**: Runs at a smooth 60 FPS
 
 ## Building
 
@@ -39,48 +37,55 @@ SoftwareRasterizer/
 - SDL3 development libraries
 - pkg-config
 
-### Linux/Unix
+### Build Commands
 
 ```bash
-cd SoftwareRasterizer
+# Build the project
 make
+
+# Run the application
+make run
+
+# Clean build files
+make clean
+
+# Run tests
+make test
+
+# Run tests with verbose output
+make test-verbose
 ```
 
-### Running
+## Testing
 
-```bash
-./SoftwareRasterizer
-```
+The project includes a comprehensive test suite using a custom testing framework. Tests are located in the `tests/` directory and cover:
 
-Press the window close button to exit.
+- Vec2, Vec3, Vec4 operations
+- Mat4 transformations
+- Mathematical utilities
+
+See [tests/README.md](tests/README.md) for more information about the testing framework.
 
 ## Architecture
 
-The rasterizer uses a hybrid approach:
-- **Custom 3D Mathematics**: All 3D transformations and projections are implemented from scratch
-- **SDL3 Integration**: Used for window creation, event handling, and 2D pixel operations
-- **Software Rendering**: Triangle rasterization is performed entirely in software using a scanline algorithm
+### Math Library
+- **Vec2, Vec3, Vec4**: Vector classes with full operator overloading
+- **Mat4**: 4x4 transformation matrix with support for:
+  - Translation, rotation, scaling
+  - Perspective and orthographic projections
+  - Matrix inverse and decomposition
+  - Euler angle conversions
 
-## Current Demo
+### Rendering Pipeline
+- Software-based triangle rasterization
+- Vertex transformation pipeline
+- Basic shading support
 
-The current implementation renders:
-- A filled green triangle demonstrating the custom rasterization algorithm
-- A red line showing basic line drawing capabilities
-
-## Future Enhancements
-
-The architecture is designed to support:
-- Texture mapping
-- Depth buffering/Z-buffering
-- Shading models (flat, Gouraud, Phong)
-- 3D model loading and rendering
-- Camera systems
-- Lighting calculations
-
-## Development
-
-This project serves as an educational implementation for understanding low-level 3D graphics concepts without relying on GPU acceleration. It provides a foundation for learning how modern graphics APIs work under the hood.
+### Entity System
+- Transform hierarchy
+- Parent-child relationships
+- World/local space transformations
 
 ## License
 
-This project is open source. Feel free to use it for educational purposes or as a starting point for your own graphics experiments.
+This project is for educational purposes.
