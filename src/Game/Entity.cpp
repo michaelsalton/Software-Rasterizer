@@ -2,10 +2,7 @@
 
 Entity::Entity(float x, float y, float z)
 {
-	mPosition.x = x;
-	mPosition.y = y;
-	mPosition.z = z;
-	mRotation = 0.0f;
+	transform.setPosition(x, y, z);
 	mActive = true;
 	mParent = NULL;
 }
@@ -17,39 +14,67 @@ Entity::~Entity()
 
 void Entity::Position(Vec3 position)
 {
-	mPosition = position;
+	transform.setPosition(position);
 }
 
 Vec3 Entity::Position(SPACE space)
 {
 	if (space == local || mParent == NULL)
 	{
-		return mPosition;
+		return transform.getPosition();
 	}
-	Vec2 rotated = Math::rotate(Vec2(mPosition.x, mPosition.y), Math::toRadians(mParent->Rotation(local)));
-	return mParent->Position(world) + Vec3(rotated.x, rotated.y, mPosition.z);
+	return transform.getWorldPosition();
 }
 
 void Entity::Rotation(float rotation)
 {
-	mRotation = rotation;
-	if (mRotation > 360.0f)
-	{
-		mRotation -= 360.0f;
-	}
-	if (mRotation < 0.0f)
-	{
-		mRotation += 360.0f;
-	}
+	// Convert single float rotation (degrees) to Euler angles
+	transform.setRotation(0, Math::toRadians(rotation), 0);
 }
 
 float Entity::Rotation(SPACE space)
 {
+	Vec3 rot = (space == local || mParent == NULL) 
+		? transform.getRotation() 
+		: transform.getWorldMatrix().toEulerAngles();
+	
+	// Return Y rotation in degrees
+	return Math::toDegrees(rot.y);
+}
+
+void Entity::Scale(const Vec3& scale)
+{
+	transform.setScale(scale);
+}
+
+void Entity::Scale(float scale)
+{
+	transform.setScale(scale);
+}
+
+Vec3 Entity::Scale(SPACE space)
+{
 	if (space == local || mParent == NULL)
 	{
-		return mRotation;
+		return transform.getScale();
 	}
-	return mParent->Rotation(world) + mRotation;
+	
+	// Extract scale from world matrix
+	Mat4 worldMat = transform.getWorldMatrix();
+	Vec3 translation, scale;
+	Mat4 rotation;
+	worldMat.decompose(translation, rotation, scale);
+	return scale;
+}
+
+Mat4 Entity::GetModelMatrix() const
+{
+	return transform.getModelMatrix();
+}
+
+Mat4 Entity::GetWorldMatrix() const
+{
+	return transform.getWorldMatrix();
 }
 
 void Entity::Active(bool active)
@@ -64,8 +89,15 @@ bool Entity::Active()
 
 void Entity::Parent(Entity* parent)
 {
-	mPosition = Position(world) - parent->Position(world);
 	mParent = parent;
+	if (parent)
+	{
+		transform.setParent(&parent->transform);
+	}
+	else
+	{
+		transform.setParent(nullptr);
+	}
 }
 
 Entity* Entity::Parent()

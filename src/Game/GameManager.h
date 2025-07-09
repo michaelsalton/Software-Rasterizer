@@ -18,6 +18,11 @@ private:
 	Graphics* mGraphics;
 	SDL_Event mEvents;
 	Timer* mTimer;
+	
+	// Demo objects
+	class Camera* mCamera;
+	Entity* mCube;
+	float mRotation;
 
 public:
 	static void Release();

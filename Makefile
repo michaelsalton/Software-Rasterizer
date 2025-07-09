@@ -2,40 +2,55 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -Isrc `pkg-config --cflags sdl3`
 LDFLAGS = `pkg-config --libs sdl3`
 
-# Source files
+# Directories
 SRC_DIR = src
+BUILD_DIR = build
+TEST_BUILD_DIR = build/tests
+
+# Source files
 SRCS = $(SRC_DIR)/Core/Main.cpp \
        $(SRC_DIR)/Graphics/Graphics.cpp \
        $(SRC_DIR)/Graphics/Renderer.cpp \
+       $(SRC_DIR)/Graphics/Vertex.cpp \
+       $(SRC_DIR)/Graphics/VertexShader.cpp \
+       $(SRC_DIR)/Graphics/Clipper.cpp \
+       $(SRC_DIR)/Graphics/PrimitiveAssembler.cpp \
+       $(SRC_DIR)/Graphics/Rasterizer.cpp \
        $(SRC_DIR)/Game/GameManager.cpp \
        $(SRC_DIR)/Game/Entity.cpp \
        $(SRC_DIR)/Utils/Timer.cpp \
        $(SRC_DIR)/Utils/InputManager.cpp
 
-OBJS = $(SRCS:.cpp=.o)
+# Object files with build directory prefix
+OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
 TARGET = SoftwareRasterizer
 
 # Test files
 TEST_SOURCES = tests/Math/Vec2Test.cpp tests/Math/Vec3Test.cpp tests/Math/Vec4Test.cpp tests/Math/Mat4Test.cpp
-TEST_OBJECTS = $(TEST_SOURCES:.cpp=.o)
+TEST_OBJECTS = $(patsubst tests/%.cpp,$(TEST_BUILD_DIR)/%.o,$(TEST_SOURCES))
 TEST_RUNNER = tests/RunAllTests
 
 .PHONY: all clean run test test-verbose
 
 all: $(TARGET)
 
+# Create build directories
+$(BUILD_DIR) $(TEST_BUILD_DIR):
+	mkdir -p $@
+
 $(TARGET): $(OBJS)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
 
-%.o: %.cpp
+# Pattern rule for building object files in build directory
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f $(OBJS) $(TARGET)
-	rm -f $(TEST_OBJECTS) tests/RunAllTests.o $(TEST_RUNNER)
+	rm -rf $(BUILD_DIR) $(TARGET) $(TEST_RUNNER)
 	find . -name "*.o" -type f -delete
 
 # Test targets
@@ -45,12 +60,10 @@ test: $(TEST_RUNNER)
 test-verbose: $(TEST_RUNNER)
 	./$(TEST_RUNNER) -v
 
-$(TEST_RUNNER): tests/RunAllTests.o $(TEST_OBJECTS)
+$(TEST_RUNNER): $(TEST_BUILD_DIR)/RunAllTests.o $(TEST_OBJECTS)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
-tests/%.o: tests/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Source pattern rule needs to handle nested directories
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
+# Pattern rule for test object files
+$(TEST_BUILD_DIR)/%.o: tests/%.cpp | $(TEST_BUILD_DIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
