@@ -8,6 +8,13 @@
 *.VC.db
 *.VC.opendb
 
+# Linux/Unix executables and build files
+SoftwareRasterizer/SoftwareRasterizer
+*.o
+*.a
+*.so
+Makefile.bak
+
 # Compiled binaries
 Debug/
 Release/
@@ -58,11 +65,9 @@ project.lock.json
 *.out
 *.app
 
-
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-Makefile
 
 .vs/
 
