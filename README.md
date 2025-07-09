@@ -28,6 +28,7 @@ Software-Rasterizer/
 - **3D Perspective Projection**: Transforms 3D coordinates to 2D screen space
 - **Primitive Rendering**: Support for points, lines, and triangles
 - **Frame Rate Control**: Runs at a smooth 60 FPS
+- **Testing Framework**: Custom unit testing framework with comprehensive test coverage
 
 ## Building
 
