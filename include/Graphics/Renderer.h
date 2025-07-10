@@ -3,16 +3,16 @@
 #include <SDL3/SDL.h>
 #include <vector>
 #include <memory>
-#include "../Math/Vec3.h"
-#include "../Math/Vec4.h"
-#include "../Math/Mat4.h"
-#include "Framebuffer.h"
-#include "Vertex.h"
-#include "VertexShader.h"
-#include "Clipper.h"
-#include "PrimitiveAssembler.h"
-#include "Rasterizer.h"
-#include "../Core/Camera.h"
+#include "Math/Vec3.h"
+#include "Math/Vec4.h"
+#include "Math/Mat4.h"
+#include "Graphics/Framebuffer.h"
+#include "Graphics/Vertex.h"
+#include "Graphics/VertexShader.h"
+#include "Graphics/Clipper.h"
+#include "Graphics/PrimitiveAssembler.h"
+#include "Graphics/Rasterizer.h"
+#include "Core/Camera.h"
 
 class Renderer
 {

@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Isrc `pkg-config --cflags sdl3`
+CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude `pkg-config --cflags sdl3`
 LDFLAGS = `pkg-config --libs sdl3`
 
 # Directories
@@ -9,8 +9,11 @@ TEST_BUILD_DIR = build/tests
 
 # Source files
 SRCS = $(SRC_DIR)/Core/Main.cpp \
+       $(SRC_DIR)/Core/Transform.cpp \
+       $(SRC_DIR)/Core/Camera.cpp \
        $(SRC_DIR)/Graphics/Graphics.cpp \
        $(SRC_DIR)/Graphics/Renderer.cpp \
+       $(SRC_DIR)/Graphics/Framebuffer.cpp \
        $(SRC_DIR)/Graphics/Vertex.cpp \
        $(SRC_DIR)/Graphics/VertexShader.cpp \
        $(SRC_DIR)/Graphics/Clipper.cpp \

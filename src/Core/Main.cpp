@@ -4,7 +4,7 @@
 #include <cstring>
 #include <cmath>
 #include <algorithm>
-#include "../Game/GameManager.h"
+#include "Game/GameManager.h"
 
 int main(int argc, char* argv[])
 {

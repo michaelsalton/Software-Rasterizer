@@ -1,5 +1,5 @@
-#include "Renderer.h"
-#include "Graphics.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/Graphics.h"
 #include <algorithm>
 #include <iostream>
 #include <cmath>

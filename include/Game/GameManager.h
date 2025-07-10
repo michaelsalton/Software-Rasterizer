@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Graphics/Graphics.h"
-#include "../Utils/Timer.h"
-#include "Entity.h"
-#include "../Graphics/Renderer.h"
+#include "Graphics/Graphics.h"
+#include "Utils/Timer.h"
+#include "Game/Entity.h"
+#include "Graphics/Renderer.h"
 
 class GameManager
 {

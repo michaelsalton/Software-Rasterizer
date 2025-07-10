@@ -1,8 +1,8 @@
 #include "../TestFramework.h"
-#include "../../src/Math/Mat4.h"
-#include "../../src/Math/Vec3.h"
-#include "../../src/Math/Vec4.h"
-#include "../../src/Math/Math.h"
+#include "Math/Mat4.h"
+#include "Math/Vec3.h"
+#include "Math/Vec4.h"
+#include "Math/Math.h"
 
 void testMat4() {
     TEST_SUITE("Mat4");

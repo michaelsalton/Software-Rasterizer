@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Math/Math.h"
-#include "../Core/Transform.h"
+#include "Math/Math.h"
+#include "Core/Transform.h"
 
 class Entity
 {

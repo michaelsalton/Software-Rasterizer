@@ -1,8 +1,8 @@
-#include "GameManager.h"
-#include "../Math/Vec3.h"
-#include "../Core/Camera.h"
-#include "../Graphics/Vertex.h"
-#include "../Graphics/VertexShader.h"
+#include "Game/GameManager.h"
+#include "Math/Vec3.h"
+#include "Core/Camera.h"
+#include "Graphics/Vertex.h"
+#include "Graphics/VertexShader.h"
 #include <cmath>
 
 GameManager* GameManager::sInstance = NULL;

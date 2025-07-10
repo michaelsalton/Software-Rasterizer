@@ -1,4 +1,4 @@
-#include "VertexShader.h"
+#include "Graphics/VertexShader.h"
 #include <cmath>
 
 // Default vertex shader implementation

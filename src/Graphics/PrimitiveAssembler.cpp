@@ -1,4 +1,4 @@
-#include "PrimitiveAssembler.h"
+#include "Graphics/PrimitiveAssembler.h"
 #include <stdexcept>
 
 PrimitiveAssembler::PrimitiveAssembler()

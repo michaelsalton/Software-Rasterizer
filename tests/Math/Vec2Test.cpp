@@ -1,6 +1,6 @@
 #include "../TestFramework.h"
-#include "../../src/Math/Vec2.h"
-#include "../../src/Math/Math.h"
+#include "Math/Vec2.h"
+#include "Math/Math.h"
 #include <sstream>
 
 void testVec2() {

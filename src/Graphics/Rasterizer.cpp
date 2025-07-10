@@ -1,4 +1,4 @@
-#include "Rasterizer.h"
+#include "Graphics/Rasterizer.h"
 #include <cmath>
 
 void Rasterizer::RasterizeTriangle(

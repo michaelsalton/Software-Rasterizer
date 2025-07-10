@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Math/Mat4.h"
-#include "../Math/Vec4.h"
-#include "Vertex.h"
+#include "Math/Mat4.h"
+#include "Math/Vec4.h"
+#include "Graphics/Vertex.h"
 #include <unordered_map>
 #include <string>
 #include <any>

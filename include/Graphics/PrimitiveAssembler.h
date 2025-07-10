@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Vertex.h"
-#include "../Math/Vec3.h"
+#include "Graphics/Vertex.h"
+#include "Math/Vec3.h"
 #include <vector>
 #include <array>
 

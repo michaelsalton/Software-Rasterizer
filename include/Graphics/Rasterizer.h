@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Math/Vec2.h"
-#include "../Math/Vec3.h"
-#include "Vertex.h"
-#include "Framebuffer.h"
+#include "Math/Vec2.h"
+#include "Math/Vec3.h"
+#include "Graphics/Vertex.h"
+#include "Graphics/Framebuffer.h"
 #include <algorithm>
 #include <functional>
 
