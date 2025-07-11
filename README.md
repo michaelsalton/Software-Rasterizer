@@ -1,34 +1,81 @@
 # Software Rasterizer
 
-A 3D software rasterizer implementation from scratch using C++ and SDL3.
-
-## Project Structure
-
-```
-Software-Rasterizer/
-├── src/                    # Source code
-│   ├── Core/              # Main application and entry point
-│   ├── Game/              # Game logic and entities
-│   ├── Graphics/          # Rendering and graphics
-│   ├── Math/              # Mathematical utilities (vectors, matrices)
-│   └── Utils/             # Utility classes (Timer, InputManager)
-├── tests/                  # Unit tests
-│   ├── Math/              # Math library tests
-│   └── TestFramework.h    # Testing framework
-├── Makefile               # Build configuration
-└── README.md              # This file
-```
+A fully-featured 3D software rasterizer from scratch using C++. This project implements a complete rendering pipeline in software, demonstrating how modern GPUs work internally without any hardware acceleration.
 
 ## Features
 
+### Core Rendering Pipeline
+
+#### Multiple Rasterization Algorithms
+- **Edge Equation Method** (default): Efficient half-space testing using edge equations
+- **Scanline Algorithm**: Traditional scanline-based triangle rasterization
+- **Hierarchical Rasterization**: Tile-based approach for improved cache coherence
+
+#### Complete Graphics Pipeline Stages
+1. **Vertex Processing**
+   - Programmable vertex shaders with base class system
+   - Built-in shaders: Default, Wave, Twist, Explode, and Spherize effects
+   - Full MVP (Model-View-Projection) transformation support
+   - Normal transformation to world space
+
+2. **Primitive Assembly**
+   - Support for multiple primitive types:
+     - Triangles, Triangle Strips, Triangle Fans
+     - Lines, Line Strips, Line Loops
+     - Points
+   - Efficient index buffer support for vertex reuse
+
+3. **Clipping**
+   - Full 3D frustum clipping using Sutherland-Hodgman algorithm
+   - Clips against all 6 frustum planes
+   - Proper homogeneous clipping in 4D space
+   - Interpolates all vertex attributes during clipping
+
+4. **Culling**
+   - Configurable back-face culling
+   - Support for both CCW and CW winding orders
+   - Front face, back face, or no culling modes
+
+5. **Rasterization**
+   - Sub-pixel precision (pixel centers at x+0.5, y+0.5)
+   - Perspective-correct attribute interpolation
+   - Barycentric coordinate calculation for smooth interpolation
+
+6. **Fragment Processing**
+   - Z-buffer depth testing
+   - Alpha blending support
+   - Per-pixel color output
+
+### Advanced Features
+
+#### Programmable Vertex Shaders
+- **Uniform System**: Pass custom parameters to shaders
+- **Time-based Effects**: Real-time vertex animation support
+- **Extensible Architecture**: Easy to add custom shaders
+
+#### Transform System
+- **Hierarchical Transforms**: Parent-child relationships for scene graphs
+- **Transform Caching**: Optimized with dirty flag system
+- **Camera System**: Perspective and orthographic projections with look-at functionality
+
+#### Rendering Capabilities
+- **Wireframe and Filled Modes**: Toggle between rendering modes
+- **Debug Visualization**: Coordinate axes, grids, and local coordinate systems
+- **Alpha Transparency**: Full alpha blending support
+
+### Performance Optimizations
+- **SIMD-friendly Math**: Vec4 operations aligned for potential vectorization
+- **Early Rejection**: Bounding box and frustum culling
+- **Cache-efficient Design**: Separate color and depth buffers
+- **Optimized Matrix Operations**: Fast 4x4 matrix multiplication
+- **Inline Math Functions**: Extensive inlining for small operations
+
+### Technical Features
 - **3D Math Library**: Comprehensive vector (Vec2, Vec3, Vec4) and matrix (Mat4) classes
-- **Software Rendering**: Triangle rasterization without GPU acceleration
-- **Entity System**: Basic game entity management with hierarchical transforms
-- **Cross-platform**: Works on Linux with SDL3
-- **3D Perspective Projection**: Transforms 3D coordinates to 2D screen space
-- **Primitive Rendering**: Support for points, lines, and triangles
-- **Frame Rate Control**: Runs at a smooth 60 FPS
-- **Testing Framework**: Custom unit testing framework with comprehensive test coverage
+- **Cross-platform**: Works on Linux, macOS, and Windows with SDL3
+- **Modern C++17**: Smart pointers, STL containers, and clean architecture
+- **Frame Rate Control**: Smooth 60 FPS with frame timing
+- **Testing Framework**: Custom unit testing with comprehensive math library coverage
 
 ## Building
 
@@ -77,10 +124,23 @@ See [tests/README.md](tests/README.md) for more information about the testing fr
   - Matrix inverse and decomposition
   - Euler angle conversions
 
-### Rendering Pipeline
-- Software-based triangle rasterization
-- Vertex transformation pipeline
-- Basic shading support
+### Rendering Pipeline Implementation
+
+The renderer implements a complete graphics pipeline with the following stages:
+
+1. **Vertex Shader Stage**: Transforms vertices from model space to clip space
+2. **Primitive Assembly**: Groups vertices into geometric primitives
+3. **Clipping**: Clips primitives against the view frustum
+4. **Perspective Division**: Converts from homogeneous to normalized device coordinates
+5. **Viewport Transform**: Maps to screen coordinates
+6. **Rasterization**: Converts primitives to fragments
+7. **Fragment Processing**: Determines final pixel colors with depth testing
+
+Key algorithms implemented:
+- **Sutherland-Hodgman** for polygon clipping
+- **Edge equations** for efficient triangle rasterization
+- **Barycentric coordinates** for attribute interpolation
+- **Z-buffer algorithm** for hidden surface removal
 
 ### Entity System
 - Transform hierarchy

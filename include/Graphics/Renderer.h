@@ -70,13 +70,15 @@ public:
 	// Debug visualization
 	void DrawAxis(const Mat4& modelMatrix = Mat4(), float length = 1.0f);
 	void DrawGrid(int size = 10, float spacing = 1.0f, const Framebuffer::Color& color = Framebuffer::Color(128, 128, 128));
+	void DrawVertexNormals(const std::vector<Vertex>& vertices, const Mat4& modelMatrix = Mat4(), float normalLength = 0.3f, const Framebuffer::Color& color = Framebuffer::Color(255, 255, 0));
+	void DrawFaceNormals(const std::vector<Vertex>& vertices, const std::vector<int>& indices, const Mat4& modelMatrix = Mat4(), float normalLength = 0.3f, const Framebuffer::Color& color = Framebuffer::Color(0, 255, 255));
 	
 	// Access to framebuffer for advanced operations
 	Framebuffer* GetFramebuffer() { return framebuffer; }
 
 private:
 	SDL_Renderer* mRenderer;
-	SDL_Texture* mTexture; // Texture to copy framebuffer to
+	SDL_Texture* mTexture;
 	Framebuffer* framebuffer;
 	Camera* camera;
 	int width;

@@ -253,6 +253,84 @@ void Renderer::DrawGrid(int size, float spacing, const Framebuffer::Color& color
     }
 }
 
+void Renderer::DrawVertexNormals(const std::vector<Vertex>& vertices, const Mat4& modelMatrix, float normalLength, const Framebuffer::Color& color)
+{
+    // Transform vertices to world space to get proper normal visualization
+    Mat4 normalMatrix = modelMatrix.inverse().transpose(); // For transforming normals
+    
+    for (const auto& vertex : vertices) {
+        // Transform vertex position to world space
+        Vec4 worldPos = modelMatrix * Vec4(vertex.position, 1.0f);
+        Vec3 startPos(worldPos.x, worldPos.y, worldPos.z);
+        
+        // Transform normal to world space (using normal matrix to handle non-uniform scaling)
+        Vec4 worldNormal = normalMatrix * Vec4(vertex.normal, 0.0f);
+        Vec3 normalDir = Vec3(worldNormal.x, worldNormal.y, worldNormal.z).normalized();
+        
+        // Calculate end position of normal line
+        Vec3 endPos = startPos + normalDir * normalLength;
+        
+        // Draw the normal as a line
+        DrawLine(startPos, endPos, color);
+        
+        // Optional: Draw a small arrow head at the end
+        Vec3 right = Vec3(1, 0, 0);
+        if (std::abs(normalDir.dot(right)) > 0.9f) {
+            right = Vec3(0, 1, 0);
+        }
+        Vec3 perpendicular = normalDir.cross(right).normalized();
+        Vec3 arrowBase = endPos - normalDir * normalLength * 0.2f;
+        
+        DrawLine(endPos, arrowBase + perpendicular * normalLength * 0.1f, color);
+        DrawLine(endPos, arrowBase - perpendicular * normalLength * 0.1f, color);
+    }
+}
+
+void Renderer::DrawFaceNormals(const std::vector<Vertex>& vertices, const std::vector<int>& indices, const Mat4& modelMatrix, float normalLength, const Framebuffer::Color& color)
+{
+    // Process each triangle
+    for (size_t i = 0; i < indices.size(); i += 3) {
+        // Get the three vertices of the triangle
+        const Vertex& v0 = vertices[indices[i]];
+        const Vertex& v1 = vertices[indices[i + 1]];
+        const Vertex& v2 = vertices[indices[i + 2]];
+        
+        // Transform vertices to world space
+        Vec4 worldPos0 = modelMatrix * Vec4(v0.position, 1.0f);
+        Vec4 worldPos1 = modelMatrix * Vec4(v1.position, 1.0f);
+        Vec4 worldPos2 = modelMatrix * Vec4(v2.position, 1.0f);
+        
+        Vec3 p0(worldPos0.x, worldPos0.y, worldPos0.z);
+        Vec3 p1(worldPos1.x, worldPos1.y, worldPos1.z);
+        Vec3 p2(worldPos2.x, worldPos2.y, worldPos2.z);
+        
+        // Calculate face center (centroid)
+        Vec3 center = (p0 + p1 + p2) * (1.0f / 3.0f);
+        
+        // Calculate face normal using cross product
+        Vec3 edge1 = p1 - p0;
+        Vec3 edge2 = p2 - p0;
+        Vec3 faceNormal = edge1.cross(edge2).normalized();
+        
+        // Calculate end position of normal line
+        Vec3 endPos = center + faceNormal * normalLength;
+        
+        // Draw the normal as a line from face center
+        DrawLine(center, endPos, color);
+        
+        // Draw arrow head
+        Vec3 right = Vec3(1, 0, 0);
+        if (std::abs(faceNormal.dot(right)) > 0.9f) {
+            right = Vec3(0, 1, 0);
+        }
+        Vec3 perpendicular = faceNormal.cross(right).normalized();
+        Vec3 arrowBase = endPos - faceNormal * normalLength * 0.2f;
+        
+        DrawLine(endPos, arrowBase + perpendicular * normalLength * 0.1f, color);
+        DrawLine(endPos, arrowBase - perpendicular * normalLength * 0.1f, color);
+    }
+}
+
 int Renderer::Interpolate(int y1, int y2, int x1, int x2, int y)
 {
     if (y1 == y2)

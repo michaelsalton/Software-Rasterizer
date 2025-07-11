@@ -197,17 +197,20 @@ const TransformedVertex& PrimitiveAssembler::GetVertex(
 }
 
 Vec3 PrimitiveAssembler::CalculateFaceNormal(const Triangle& triangle) const {
-    // Use screen space positions for culling
+    // Use screen space positions for culling (2D cross product)
     const Vec3& v0 = triangle.vertices[0].screenPosition;
     const Vec3& v1 = triangle.vertices[1].screenPosition;
     const Vec3& v2 = triangle.vertices[2].screenPosition;
     
-    // Calculate edge vectors
-    Vec3 edge1 = v1 - v0;
-    Vec3 edge2 = v2 - v0;
+    // For 2D cross product in screen space, we only care about x,y
+    // Calculate signed area of triangle
+    float signedArea = (v1.x - v0.x) * (v2.y - v0.y) - (v2.x - v0.x) * (v1.y - v0.y);
     
-    // Cross product gives normal (pointing towards viewer if CCW)
-    return edge1.cross(edge2).normalized();
+    // Create a normal vector based on the signed area
+    // In screen space with Y-down, the interpretation is reversed:
+    // Negative area = CCW = front facing (normal points towards viewer)
+    // Positive area = CW = back facing (normal points away)
+    return Vec3(0, 0, -signedArea);
 }
 
 bool PrimitiveAssembler::IsFrontFacing(const Triangle& triangle) const {

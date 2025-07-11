@@ -32,6 +32,7 @@ tests/RunAllTests
 *.exp
 *.tlog
 *.ipch
+.claude
 
 # OS files
 .DS_Store
