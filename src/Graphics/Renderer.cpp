@@ -310,13 +310,17 @@ void Renderer::DrawFaceNormals(const std::vector<Vertex>& vertices, const std::v
         // Calculate face normal using cross product
         Vec3 edge1 = p1 - p0;
         Vec3 edge2 = p2 - p0;
-        Vec3 faceNormal = edge1.cross(edge2).normalized();
+        Vec3 faceNormal = edge2.cross(edge1).normalized();
+        
+        // Offset the center slightly along the normal to avoid z-fighting
+        Vec3 offsetCenter = center + faceNormal * 0.01f;
         
         // Calculate end position of normal line
-        Vec3 endPos = center + faceNormal * normalLength;
+        Vec3 endPos = offsetCenter + faceNormal * normalLength;
         
         // Draw the normal as a line from face center
-        DrawLine(center, endPos, color);
+        // Pass identity matrix since positions are already in world space
+        DrawLine(offsetCenter, endPos, color, Mat4());
         
         // Draw arrow head
         Vec3 right = Vec3(1, 0, 0);
@@ -326,8 +330,8 @@ void Renderer::DrawFaceNormals(const std::vector<Vertex>& vertices, const std::v
         Vec3 perpendicular = faceNormal.cross(right).normalized();
         Vec3 arrowBase = endPos - faceNormal * normalLength * 0.2f;
         
-        DrawLine(endPos, arrowBase + perpendicular * normalLength * 0.1f, color);
-        DrawLine(endPos, arrowBase - perpendicular * normalLength * 0.1f, color);
+        DrawLine(endPos, arrowBase + perpendicular * normalLength * 0.1f, color, Mat4());
+        DrawLine(endPos, arrowBase - perpendicular * normalLength * 0.1f, color, Mat4());
     }
 }
 
