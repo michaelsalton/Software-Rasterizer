@@ -116,18 +116,18 @@ void GameManager::Run()
 			
 			// Indices for colored cube (24 vertices)
 			std::vector<int> coloredCubeIndices = {
-				// Front face (CCW when viewed from front)
-				0, 1, 2,  2, 3, 0,
-				// Back face (CCW when viewed from back) 
-				5, 4, 7,  7, 6, 5,
-				// Left face (CCW when viewed from left)
-				9, 8, 11,  11, 10, 9,
-				// Right face (CCW when viewed from right)
-				12, 13, 14,  14, 15, 12,
-				// Top face (CCW when viewed from top)
-				16, 17, 18,  18, 19, 16,
-				// Bottom face (CCW when viewed from bottom)
-				21, 20, 23,  23, 22, 21
+				// Front face (CCW in screen space with Y-down)
+				0, 3, 2,  2, 1, 0,
+				// Back face
+				4, 5, 6,  6, 7, 4,
+				// Left face
+				8, 9, 10,  10, 11, 8,
+				// Right face
+				13, 12, 15,  15, 14, 13,
+				// Top face
+				17, 16, 19,  19, 18, 17,
+				// Bottom face
+				20, 21, 22,  22, 23, 20
 			};
 			
 			// Update cube transform - position at center
