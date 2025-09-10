@@ -1,5 +1,6 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/Graphics.h"
+#include "Graphics/BitmapFont.h"
 #include <algorithm>
 #include <iostream>
 #include <cmath>
@@ -774,4 +775,8 @@ void Renderer::SetScissorRect(int left, int top, int right, int bottom) {
     pipelineState.rasterizer.scissorRect.top = top;
     pipelineState.rasterizer.scissorRect.right = right;
     pipelineState.rasterizer.scissorRect.bottom = bottom;
+}
+
+void Renderer::DrawText(const std::string& text, int x, int y, const Framebuffer::Color& color) {
+    BitmapFont::DrawString(framebuffer, text, x, y, color);
 }

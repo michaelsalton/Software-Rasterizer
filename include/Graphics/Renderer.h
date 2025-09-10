@@ -85,6 +85,9 @@ public:
 	void DrawVertexNormals(const std::vector<Vertex>& vertices, const Mat4& modelMatrix = Mat4(), float normalLength = 0.3f, const Framebuffer::Color& color = Framebuffer::Color(255, 255, 0));
 	void DrawFaceNormals(const std::vector<Vertex>& vertices, const std::vector<int>& indices, const Mat4& modelMatrix = Mat4(), float normalLength = 0.3f, const Framebuffer::Color& color = Framebuffer::Color(0, 255, 255));
 	
+	// Text rendering
+	void DrawText(const std::string& text, int x, int y, const Framebuffer::Color& color = Framebuffer::Color(255, 255, 255));
+	
 	// Access to framebuffer for advanced operations
 	Framebuffer* GetFramebuffer() { return framebuffer; }
 

@@ -23,6 +23,12 @@ private:
 	class Camera* mCamera;
 	Entity* mCube;
 	float mRotation;
+	
+	// FPS tracking
+	float mFPS;
+	float mFrameTime;
+	int mFrameCount;
+	float mFPSUpdateTime;
 
 public:
 	static void Release();

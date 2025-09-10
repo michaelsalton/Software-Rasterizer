@@ -4,6 +4,7 @@
 #include "Graphics/Vertex.h"
 #include "Graphics/VertexShader.h"
 #include <cmath>
+#include <cstdio>
 
 GameManager* GameManager::sInstance = NULL;
 
@@ -37,6 +38,12 @@ GameManager::GameManager()
 	// Create demo cube
 	mCube = new Entity();
 	mRotation = 0.0f;
+	
+	// Initialize FPS tracking
+	mFPS = 0.0f;
+	mFrameTime = 0.0f;
+	mFrameCount = 0;
+	mFPSUpdateTime = 0.0f;
 }
 
 GameManager::~GameManager()
@@ -71,6 +78,20 @@ void GameManager::Run()
 		}
 		if (mTimer->DeltaTime() > 1.0f / FRAME_RATE)
 		{
+			// FPS calculation
+			float deltaTime = mTimer->DeltaTime();
+			mFrameTime += deltaTime;
+			mFrameCount++;
+			mFPSUpdateTime += deltaTime;
+			
+			// Update FPS display every 0.5 seconds
+			if (mFPSUpdateTime >= 0.5f) {
+				mFPS = mFrameCount / mFrameTime;
+				mFrameCount = 0;
+				mFrameTime = 0.0f;
+				mFPSUpdateTime = 0.0f;
+			}
+			
 			// Update rotation
 			mRotation += 1.0f;
 			
@@ -83,6 +104,10 @@ void GameManager::Run()
 			// Test scissor rect (uncomment to test scissor functionality)
 			// mRenderer->SetScissorTest(true);
 			// mRenderer->SetScissorRect(100, 100, Graphics::WINDOW_WIDTH - 100, Graphics::WINDOW_HEIGHT - 100);
+			
+			// Test fill mode (uncomment to test wireframe or point modes)
+			// mRenderer->SetFillMode(FillMode::WIREFRAME);
+			// mRenderer->SetFillMode(FillMode::POINT);
 			
 			// Create colored cube vertices - each face has a different solid color
 			std::vector<Vertex> coloredCubeVertices = {
@@ -151,6 +176,11 @@ void GameManager::Run()
 			
 			// Optionally also draw vertex normals (yellow color, from vertices)
 			// mRenderer->DrawVertexNormals(coloredCubeVertices, mCube->GetWorldMatrix(), 0.3f, Framebuffer::Color(255, 255, 0));
+			
+			// Draw FPS counter
+			char fpsText[32];
+			snprintf(fpsText, sizeof(fpsText), "FPS: %.1f", mFPS);
+			mRenderer->DrawText(fpsText, 10, 10, Framebuffer::Color(255, 255, 0));
 			
 			// Present framebuffer to screen
 			mRenderer->Present();
