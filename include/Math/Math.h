@@ -5,9 +5,9 @@
 #include <limits>
 
 // Include vector types
-#include "Math/Vec2.h"
-#include "Math/Vec3.h"
-#include "Math/Vec4.h"
+#include "Math/vec2.h"
+#include "Math/vec3.h"
+#include "Math/vec4.h"
 
 namespace Math {
 

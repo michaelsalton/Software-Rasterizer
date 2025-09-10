@@ -1,4 +1,4 @@
-#include "Game/Entity.h"
+#include "Game/entity.h"
 
 Entity::Entity(float x, float y, float z)
 {

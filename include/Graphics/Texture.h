@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Math/Vec2.h"
-#include "Math/Vec4.h"
+#include "Math/vec2.h"
+#include "Math/vec4.h"
 #include <vector>
 #include <string>
 #include <cstdint>

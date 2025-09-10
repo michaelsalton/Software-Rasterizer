@@ -1,6 +1,6 @@
-#include "Graphics/Renderer.h"
-#include "Graphics/Graphics.h"
-#include "Graphics/BitmapFont.h"
+#include "Graphics/renderer.h"
+#include "Graphics/graphics.h"
+#include "Graphics/bitmap_font.h"
 #include <algorithm>
 #include <iostream>
 #include <cmath>

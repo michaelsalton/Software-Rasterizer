@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Vec3.h"
+#include "Math/vec3.h"
 
 // Base class for all light types
 class Light {

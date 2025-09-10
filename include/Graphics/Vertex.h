@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Math/Vec2.h"
-#include "Math/Vec3.h"
-#include "Math/Vec4.h"
-#include "Math/Mat4.h"
-#include "Graphics/Framebuffer.h"
+#include "Math/vec2.h"
+#include "Math/vec3.h"
+#include "Math/vec4.h"
+#include "Math/mat4.h"
+#include "Graphics/frame_buffer.h"
 
 // Comprehensive vertex structure with all common attributes
 struct Vertex {

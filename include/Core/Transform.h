@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Math/Vec3.h"
-#include "Math/Mat4.h"
-#include "Math/Math.h"
+#include "Math/vec3.h"
+#include "Math/mat4.h"
+#include "Math/math.h"
 
 class Transform {
 private:

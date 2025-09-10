@@ -1,4 +1,4 @@
-#include "Graphics/Vertex.h"
+#include "Graphics/vertex.h"
 #include <algorithm>
 
 namespace VertexProcessor {

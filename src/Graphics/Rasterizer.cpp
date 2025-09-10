@@ -1,5 +1,5 @@
-#include "Graphics/Rasterizer.h"
-#include "Graphics/FragmentShader.h"
+#include "Graphics/rasterizer.h"
+#include "Graphics/fragment_shader.h"
 #include <cmath>
 
 void Rasterizer::RasterizeTriangle(

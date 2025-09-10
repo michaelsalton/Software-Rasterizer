@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <iostream>
-#include "Math/Vec3.h"
+#include "Math/vec3.h"
 
 class Vec4
 {

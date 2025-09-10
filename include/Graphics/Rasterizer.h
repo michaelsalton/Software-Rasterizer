@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Math/Vec2.h"
-#include "Math/Vec3.h"
-#include "Graphics/Vertex.h"
-#include "Graphics/Framebuffer.h"
-#include "Graphics/FragmentShader.h"
-#include "Graphics/VertexShader.h"
+#include "Math/vec2.h"
+#include "Math/vec3.h"
+#include "Graphics/vertex.h"
+#include "Graphics/frame_buffer.h"
+#include "Graphics/fragment_shader.h"
+#include "Graphics/vertex_shader.h"
 #include <algorithm>
 #include <functional>
 

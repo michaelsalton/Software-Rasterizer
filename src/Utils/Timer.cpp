@@ -1,4 +1,4 @@
-#include "Utils/Timer.h"
+#include "Utils/timer.h"
 
 Timer* Timer::sInstance = NULL;
 

@@ -1,4 +1,4 @@
-#include "Graphics/Clipper.h"
+#include "Graphics/clipper.h"
 #include <algorithm>
 
 // Static member initialization
