@@ -6,6 +6,7 @@
 #include "Graphics/FragmentShader.h"
 #include "Graphics/Texture.h"
 #include "Graphics/TextureGenerator.h"
+#include "imgui.h"
 #include <cmath>
 #include <cstdio>
 
@@ -51,7 +52,7 @@ GameManager::GameManager()
 	mRotation = 0.0f;
 	
 	// Initialize FPS tracking
-	mFPS = 0.0f;
+	mFPS = 60.0f;  // Start with expected FPS
 	mFrameTime = 0.0f;
 	mFrameCount = 0;
 	mFPSUpdateTime = 0.0f;
@@ -126,9 +127,10 @@ void GameManager::Run()
 			mFrameCount++;
 			mFPSUpdateTime += deltaTime;
 			
-			// Update FPS display every 0.5 seconds
-			if (mFPSUpdateTime >= 0.5f) {
+			// Update FPS display every 0.1 seconds
+			if (mFPSUpdateTime >= 0.1f) {
 				mFPS = mFrameCount / mFrameTime;
+				// printf("Updated FPS: %.1f (frames: %d, time: %.3f)\n", mFPS, mFrameCount, mFrameTime);
 				mFrameCount = 0;
 				mFrameTime = 0.0f;
 				mFPSUpdateTime = 0.0f;
@@ -143,7 +145,7 @@ void GameManager::Run()
 			}
 			
 			// Clear framebuffer
-			mRenderer->Clear(Framebuffer::Color(30, 30, 30)); // Dark gray background
+			mRenderer->Clear(Framebuffer::Color(1, 1, 1)); // Dark gray background
 			
 			// Apply GUI settings
 			// Cull mode
@@ -286,7 +288,9 @@ void GameManager::Run()
 			// Draw FPS counter if enabled
 			if (mRenderSettings.showFPS) {
 				char fpsText[32];
-				snprintf(fpsText, sizeof(fpsText), "FPS: %.1f", mFPS);
+				// Use ImGui's FPS calculation for consistency with the control panel
+				float imguiFPS = mGUIManager ? ImGui::GetIO().Framerate : mFPS;
+				snprintf(fpsText, sizeof(fpsText), "FPS: %.1f", imguiFPS);
 				mRenderer->DrawText(fpsText, 10, 10, Framebuffer::Color(255, 255, 0));
 			}
 			
