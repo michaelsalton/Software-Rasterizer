@@ -39,6 +39,11 @@ private:
 	std::shared_ptr<class Texture> mTestTexture;
 	std::shared_ptr<class TexturedFragmentShader> mTexturedShader;
 	
+	// Lighting demo
+	std::shared_ptr<class LitFragmentShader> mLitShader;
+	std::shared_ptr<class DirectionalLight> mSunLight;
+	float mLightAngle;
+	
 	// GUI
 	GUIManager* mGUIManager;
 	RenderSettings mRenderSettings;

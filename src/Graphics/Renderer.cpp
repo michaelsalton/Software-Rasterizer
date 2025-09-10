@@ -602,6 +602,7 @@ void Renderer::UpdateShaderUniforms(const Mat4& modelMatrix) {
     shaderUniforms.modelMatrix = modelMatrix;
     shaderUniforms.viewMatrix = cam->getViewMatrix();
     shaderUniforms.projectionMatrix = cam->getProjectionMatrix();
+    shaderUniforms.cameraPosition = cam->getPosition();
     shaderUniforms.UpdateDerivedMatrices();
 }
 

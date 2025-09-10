@@ -54,6 +54,9 @@ struct TransformedVertex {
     
     // Screen space position after perspective divide and viewport transform
     Vec3 screenPosition; // x, y in pixels, z is depth [0,1]
+    
+    // For perspective-correct interpolation
+    float invW;          // 1/w value from clip space (1/clipPosition.w)
 };
 
 // Vertex processing pipeline functions

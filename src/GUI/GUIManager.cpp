@@ -100,6 +100,18 @@ void GUIManager::DrawControlPanel(RenderSettings& settings) {
             ImGui::Combo("Texture Filter", &settings.textureFilter, filterModes, 3);
         }
         
+        // Lighting
+        if (ImGui::CollapsingHeader("Lighting")) {
+            ImGui::Checkbox("Enable Lighting", &settings.enableLighting);
+            
+            if (settings.enableLighting) {
+                ImGui::Checkbox("Animate Light", &settings.animateLight);
+                
+                const char* shadingModels[] = { "Phong", "Blinn-Phong", "Lambert" };
+                ImGui::Combo("Shading Model", &settings.shadingModel, shadingModels, 3);
+            }
+        }
+        
         // Pipeline settings
         if (ImGui::CollapsingHeader("Pipeline")) {
             ImGui::Checkbox("Depth Test", &settings.enableDepthTest);

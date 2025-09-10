@@ -24,6 +24,7 @@ SRCS = $(SRC_DIR)/Core/Main.cpp \
        $(SRC_DIR)/Graphics/Texture.cpp \
        $(SRC_DIR)/Graphics/FragmentShader.cpp \
        $(SRC_DIR)/Graphics/TextureGenerator.cpp \
+       $(SRC_DIR)/Lighting/Light.cpp \
        $(SRC_DIR)/Game/GameManager.cpp \
        $(SRC_DIR)/Game/Entity.cpp \
        $(SRC_DIR)/Utils/Timer.cpp \

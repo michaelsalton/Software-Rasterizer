@@ -34,6 +34,9 @@ struct ShaderUniforms {
     Mat4 mvpMatrix;            // Pre-computed model * view * projection
     Mat4 normalMatrix;         // Inverse transpose of model matrix for normals
     
+    // Camera info
+    Vec3 cameraPosition;       // World space camera position
+    
     // Viewport info
     int viewportWidth;
     int viewportHeight;

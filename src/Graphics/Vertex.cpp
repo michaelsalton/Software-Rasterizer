@@ -29,6 +29,9 @@ TransformedVertex ProcessVertex(const Vertex& vertex,
     // Convert to screen space
     result.screenPosition = ClipToScreen(result.clipPosition, viewportWidth, viewportHeight);
     
+    // Calculate inverse W for perspective-correct interpolation
+    result.invW = (result.clipPosition.w != 0.0f) ? 1.0f / result.clipPosition.w : 1.0f;
+    
     return result;
 }
 
@@ -80,25 +83,54 @@ TransformedVertex InterpolateVertex(const TransformedVertex& v0,
                                   float w0, float w1, float w2) {
     TransformedVertex result;
     
-    // Interpolate positions
+    // For perspective-correct interpolation, we need to:
+    // 1. Interpolate 1/w
+    // 2. Interpolate attributes divided by w
+    // 3. Divide by interpolated 1/w to get final values
+    
+    // Interpolate inverse W
+    float interpolatedInvW = v0.invW * w0 + v1.invW * w1 + v2.invW * w2;
+    result.invW = interpolatedInvW;
+    
+    // Calculate the reciprocal for perspective correction
+    float perspectiveCorrection = 1.0f / interpolatedInvW;
+    
+    // Interpolate positions (world space doesn't need perspective correction)
     result.worldPosition = v0.worldPosition * w0 + v1.worldPosition * w1 + v2.worldPosition * w2;
     result.worldNormal = (v0.worldNormal * w0 + v1.worldNormal * w1 + v2.worldNormal * w2).normalized();
     
-    // Interpolate texture coordinates
-    result.texCoord = v0.texCoord * w0 + v1.texCoord * w1 + v2.texCoord * w2;
+    // Perspective-correct texture coordinate interpolation
+    Vec2 texU = v0.texCoord * (w0 * v0.invW) + 
+                v1.texCoord * (w1 * v1.invW) + 
+                v2.texCoord * (w2 * v2.invW);
+    result.texCoord = texU * perspectiveCorrection;
     
-    // Interpolate colors
-    float r = v0.color.r * w0 + v1.color.r * w1 + v2.color.r * w2;
-    float g = v0.color.g * w0 + v1.color.g * w1 + v2.color.g * w2;
-    float b = v0.color.b * w0 + v1.color.b * w1 + v2.color.b * w2;
-    float a = v0.color.a * w0 + v1.color.a * w1 + v2.color.a * w2;
+    // Perspective-correct color interpolation
+    float r = v0.color.r * (w0 * v0.invW) + 
+              v1.color.r * (w1 * v1.invW) + 
+              v2.color.r * (w2 * v2.invW);
+    float g = v0.color.g * (w0 * v0.invW) + 
+              v1.color.g * (w1 * v1.invW) + 
+              v2.color.g * (w2 * v2.invW);
+    float b = v0.color.b * (w0 * v0.invW) + 
+              v1.color.b * (w1 * v1.invW) + 
+              v2.color.b * (w2 * v2.invW);
+    float a = v0.color.a * (w0 * v0.invW) + 
+              v1.color.a * (w1 * v1.invW) + 
+              v2.color.a * (w2 * v2.invW);
+    
+    // Apply perspective correction
+    r *= perspectiveCorrection;
+    g *= perspectiveCorrection;
+    b *= perspectiveCorrection;
+    a *= perspectiveCorrection;
     
     result.color.r = static_cast<uint8_t>(std::max(0.0f, std::min(255.0f, r)));
     result.color.g = static_cast<uint8_t>(std::max(0.0f, std::min(255.0f, g)));
     result.color.b = static_cast<uint8_t>(std::max(0.0f, std::min(255.0f, b)));
     result.color.a = static_cast<uint8_t>(std::max(0.0f, std::min(255.0f, a)));
     
-    // Screen position would be interpolated during rasterization
+    // Screen position interpolation (already in screen space, linear is correct)
     result.screenPosition = v0.screenPosition * w0 + v1.screenPosition * w1 + v2.screenPosition * w2;
     
     // Clip position interpolation (if needed for further processing)

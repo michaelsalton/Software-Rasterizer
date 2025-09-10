@@ -27,6 +27,9 @@ TransformedVertex DefaultVertexShader::Process(const Vertex& input, const Shader
         uniforms.viewportHeight
     );
     
+    // Calculate inverse W for perspective-correct interpolation
+    output.invW = (output.clipPosition.w != 0.0f) ? 1.0f / output.clipPosition.w : 1.0f;
+    
     return output;
 }
 
@@ -71,6 +74,9 @@ TransformedVertex WaveVertexShader::Process(const Vertex& input, const ShaderUni
         uniforms.viewportWidth, 
         uniforms.viewportHeight
     );
+    
+    // Calculate inverse W for perspective-correct interpolation
+    output.invW = (output.clipPosition.w != 0.0f) ? 1.0f / output.clipPosition.w : 1.0f;
     
     return output;
 }
@@ -121,6 +127,9 @@ TransformedVertex TwistVertexShader::Process(const Vertex& input, const ShaderUn
         uniforms.viewportHeight
     );
     
+    // Calculate inverse W for perspective-correct interpolation
+    output.invW = (output.clipPosition.w != 0.0f) ? 1.0f / output.clipPosition.w : 1.0f;
+    
     return output;
 }
 
@@ -160,6 +169,9 @@ TransformedVertex ExplodeVertexShader::Process(const Vertex& input, const Shader
         uniforms.viewportWidth, 
         uniforms.viewportHeight
     );
+    
+    // Calculate inverse W for perspective-correct interpolation
+    output.invW = (output.clipPosition.w != 0.0f) ? 1.0f / output.clipPosition.w : 1.0f;
     
     return output;
 }
@@ -204,6 +216,9 @@ TransformedVertex SpherizeVertexShader::Process(const Vertex& input, const Shade
         uniforms.viewportWidth, 
         uniforms.viewportHeight
     );
+    
+    // Calculate inverse W for perspective-correct interpolation
+    output.invW = (output.clipPosition.w != 0.0f) ? 1.0f / output.clipPosition.w : 1.0f;
     
     return output;
 }

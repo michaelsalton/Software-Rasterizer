@@ -6,6 +6,8 @@
 #include "Graphics/FragmentShader.h"
 #include "Graphics/Texture.h"
 #include "Graphics/TextureGenerator.h"
+#include "Lighting/Light.h"
+#include "Lighting/Material.h"
 #include "imgui.h"
 #include <cmath>
 #include <cstdio>
@@ -70,7 +72,7 @@ GameManager::GameManager()
 	
 	// Load texture from file
 	try {
-		mTestTexture = std::make_shared<Texture>("assets/textures/checker.png");
+		mTestTexture = std::make_shared<Texture>("assets/textures/metal.jpg");
 		printf("Loaded texture from file!\n");
 	} catch (const std::exception& e) {
 		printf("Failed to load texture: %s\n", e.what());
@@ -86,6 +88,28 @@ GameManager::GameManager()
 	// Create textured fragment shader
 	mTexturedShader = std::make_shared<TexturedFragmentShader>();
 	mTexturedShader->SetTexture(mTestTexture.get());
+	
+	// Create lit fragment shader
+	mLitShader = std::make_shared<LitFragmentShader>();
+	mLitShader->SetAlbedoTexture(mTestTexture.get());
+	
+	// Set up a basic material
+	Material cubeMaterial = Material::Plastic(Vec3(1, 1, 1), 32.0f);
+	cubeMaterial.albedoTexture = 0; // Use first texture
+	mLitShader->SetMaterial(cubeMaterial);
+	
+	// Create a directional light (sun)
+	mSunLight = std::make_shared<DirectionalLight>(
+		Vec3(0, -1, -1).normalized(),  // Direction the light is shining
+		Vec3(1.0f, 0.95f, 0.8f),      // Warm white color
+		1.0f                          // Full intensity
+	);
+	mLitShader->AddLight(mSunLight);
+	
+	// Set ambient light
+	mLitShader->SetAmbientLight(Vec3(0.2f, 0.2f, 0.25f)); // Slightly blue ambient
+	
+	mLightAngle = 0.0f;
 }
 
 GameManager::~GameManager()
@@ -167,6 +191,31 @@ void GameManager::Run()
 				mRotation += 60.0f * deltaTime;  // 60 degrees per second
 			}
 			
+			// Update light animation
+			if (mRenderSettings.enableLighting && mRenderSettings.animateLight) {
+				mLightAngle += 30.0f * deltaTime; // 30 degrees per second
+				
+				// Rotate light direction around Y axis
+				float radians = Math::toRadians(mLightAngle);
+				Vec3 lightDir(sin(radians), -0.7f, cos(radians));
+				mSunLight->setDirection(lightDir.normalized());
+			}
+			
+			// Update shader material based on GUI settings
+			if (mLitShader) {
+				Material mat = Material::Plastic(Vec3(1, 1, 1), 32.0f);
+				mat.albedoTexture = 0;
+				
+				// Set shading model based on GUI
+				switch (mRenderSettings.shadingModel) {
+					case 0: mat.shadingModel = Material::PHONG; break;
+					case 1: mat.shadingModel = Material::BLINN_PHONG; break;
+					case 2: mat.shadingModel = Material::LAMBERT; break;
+				}
+				
+				mLitShader->SetMaterial(mat);
+			}
+			
 			// Start GUI frame
 			if (mGUIManager) {
 				mGUIManager->BeginFrame();
@@ -190,20 +239,22 @@ void GameManager::Run()
 				case 2: mRenderer->SetFillMode(FillMode::POINT); break;
 			}
 			
-			// Texture settings
-			if (mRenderSettings.enableTextures) {
+			// Shader selection based on lighting and texture settings
+			if (mRenderSettings.enableLighting) {
+				mRenderer->SetFragmentShader(mLitShader);
+			} else if (mRenderSettings.enableTextures) {
 				mRenderer->SetFragmentShader(mTexturedShader);
-				
-				// Update texture filter
-				if (mTestTexture) {
-					switch (mRenderSettings.textureFilter) {
-						case 0: mTestTexture->SetFilter(TextureFilter::NEAREST); break;
-						case 1: mTestTexture->SetFilter(TextureFilter::BILINEAR); break;
-						case 2: mTestTexture->SetFilter(TextureFilter::TRILINEAR); break;
-					}
-				}
 			} else {
 				mRenderer->SetFragmentShader(nullptr);
+			}
+			
+			// Update texture filter
+			if (mTestTexture && mRenderSettings.enableTextures) {
+				switch (mRenderSettings.textureFilter) {
+					case 0: mTestTexture->SetFilter(TextureFilter::NEAREST); break;
+					case 1: mTestTexture->SetFilter(TextureFilter::BILINEAR); break;
+					case 2: mTestTexture->SetFilter(TextureFilter::TRILINEAR); break;
+				}
 			}
 			
 			// Rasterization algorithm
@@ -228,38 +279,38 @@ void GameManager::Run()
 			// mRenderer->SetFillMode(FillMode::WIREFRAME);
 			// mRenderer->SetFillMode(FillMode::POINT);
 			
-			// Create colored cube vertices - each face has a different solid color
+			// Create textured cube vertices - white color for all vertices (texture only)
 			std::vector<Vertex> coloredCubeVertices = {
-				// Front face - Red
-				Vertex(Vec3(-0.5f, -0.5f,  0.5f), Vec3(0, 0, 1), Vec2(0, 1), 255, 0, 0),
-				Vertex(Vec3( 0.5f, -0.5f,  0.5f), Vec3(0, 0, 1), Vec2(1, 1), 255, 0, 0),
-				Vertex(Vec3( 0.5f,  0.5f,  0.5f), Vec3(0, 0, 1), Vec2(1, 0), 255, 0, 0),
-				Vertex(Vec3(-0.5f,  0.5f,  0.5f), Vec3(0, 0, 1), Vec2(0, 0), 255, 0, 0),
-				// Back face - Blue
-				Vertex(Vec3(-0.5f, -0.5f, -0.5f), Vec3(0, 0, -1), Vec2(0, 1), 0, 0, 255),
-				Vertex(Vec3( 0.5f, -0.5f, -0.5f), Vec3(0, 0, -1), Vec2(1, 1), 0, 0, 255),
-				Vertex(Vec3( 0.5f,  0.5f, -0.5f), Vec3(0, 0, -1), Vec2(1, 0), 0, 0, 255),
-				Vertex(Vec3(-0.5f,  0.5f, -0.5f), Vec3(0, 0, -1), Vec2(0, 0), 0, 0, 255),
-				// Left face - Green 
-				Vertex(Vec3(-0.5f, -0.5f,  0.5f), Vec3(-1, 0, 0), Vec2(0, 1), 0, 255, 0),  // front-bottom
-				Vertex(Vec3(-0.5f, -0.5f, -0.5f), Vec3(-1, 0, 0), Vec2(1, 1), 0, 255, 0),  // back-bottom
-				Vertex(Vec3(-0.5f,  0.5f, -0.5f), Vec3(-1, 0, 0), Vec2(1, 0), 0, 255, 0),  // back-top
-				Vertex(Vec3(-0.5f,  0.5f,  0.5f), Vec3(-1, 0, 0), Vec2(0, 0), 0, 255, 0),  // front-top
-				// Right face - Magenta
-				Vertex(Vec3( 0.5f, -0.5f,  0.5f), Vec3(1, 0, 0), Vec2(0, 1), 255, 0, 255),
-				Vertex(Vec3( 0.5f, -0.5f, -0.5f), Vec3(1, 0, 0), Vec2(1, 1), 255, 0, 255),
-				Vertex(Vec3( 0.5f,  0.5f, -0.5f), Vec3(1, 0, 0), Vec2(1, 0), 255, 0, 255),
-				Vertex(Vec3( 0.5f,  0.5f,  0.5f), Vec3(1, 0, 0), Vec2(0, 0), 255, 0, 255),
-				// Top face - Yellow
-				Vertex(Vec3(-0.5f,  0.5f,  0.5f), Vec3(0, 1, 0), Vec2(0, 1), 255, 255, 0),
-				Vertex(Vec3( 0.5f,  0.5f,  0.5f), Vec3(0, 1, 0), Vec2(1, 1), 255, 255, 0),
-				Vertex(Vec3( 0.5f,  0.5f, -0.5f), Vec3(0, 1, 0), Vec2(1, 0), 255, 255, 0),
-				Vertex(Vec3(-0.5f,  0.5f, -0.5f), Vec3(0, 1, 0), Vec2(0, 0), 255, 255, 0),
-				// Bottom face - Cyan
-				Vertex(Vec3(-0.5f, -0.5f,  0.5f), Vec3(0, -1, 0), Vec2(0, 1), 0, 255, 255),
-				Vertex(Vec3( 0.5f, -0.5f,  0.5f), Vec3(0, -1, 0), Vec2(1, 1), 0, 255, 255),
-				Vertex(Vec3( 0.5f, -0.5f, -0.5f), Vec3(0, -1, 0), Vec2(1, 0), 0, 255, 255),
-				Vertex(Vec3(-0.5f, -0.5f, -0.5f), Vec3(0, -1, 0), Vec2(0, 0), 0, 255, 255)
+				// Front face
+				Vertex(Vec3(-0.5f, -0.5f,  0.5f), Vec3(0, 0, 1), Vec2(0, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f, -0.5f,  0.5f), Vec3(0, 0, 1), Vec2(1, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f,  0.5f,  0.5f), Vec3(0, 0, 1), Vec2(1, 0), 255, 255, 255),
+				Vertex(Vec3(-0.5f,  0.5f,  0.5f), Vec3(0, 0, 1), Vec2(0, 0), 255, 255, 255),
+				// Back face
+				Vertex(Vec3(-0.5f, -0.5f, -0.5f), Vec3(0, 0, -1), Vec2(0, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f, -0.5f, -0.5f), Vec3(0, 0, -1), Vec2(1, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f,  0.5f, -0.5f), Vec3(0, 0, -1), Vec2(1, 0), 255, 255, 255),
+				Vertex(Vec3(-0.5f,  0.5f, -0.5f), Vec3(0, 0, -1), Vec2(0, 0), 255, 255, 255),
+				// Left face
+				Vertex(Vec3(-0.5f, -0.5f,  0.5f), Vec3(-1, 0, 0), Vec2(0, 1), 255, 255, 255),
+				Vertex(Vec3(-0.5f, -0.5f, -0.5f), Vec3(-1, 0, 0), Vec2(1, 1), 255, 255, 255),
+				Vertex(Vec3(-0.5f,  0.5f, -0.5f), Vec3(-1, 0, 0), Vec2(1, 0), 255, 255, 255),
+				Vertex(Vec3(-0.5f,  0.5f,  0.5f), Vec3(-1, 0, 0), Vec2(0, 0), 255, 255, 255),
+				// Right face
+				Vertex(Vec3( 0.5f, -0.5f,  0.5f), Vec3(1, 0, 0), Vec2(0, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f, -0.5f, -0.5f), Vec3(1, 0, 0), Vec2(1, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f,  0.5f, -0.5f), Vec3(1, 0, 0), Vec2(1, 0), 255, 255, 255),
+				Vertex(Vec3( 0.5f,  0.5f,  0.5f), Vec3(1, 0, 0), Vec2(0, 0), 255, 255, 255),
+				// Top face
+				Vertex(Vec3(-0.5f,  0.5f,  0.5f), Vec3(0, 1, 0), Vec2(0, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f,  0.5f,  0.5f), Vec3(0, 1, 0), Vec2(1, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f,  0.5f, -0.5f), Vec3(0, 1, 0), Vec2(1, 0), 255, 255, 255),
+				Vertex(Vec3(-0.5f,  0.5f, -0.5f), Vec3(0, 1, 0), Vec2(0, 0), 255, 255, 255),
+				// Bottom face
+				Vertex(Vec3(-0.5f, -0.5f,  0.5f), Vec3(0, -1, 0), Vec2(0, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f, -0.5f,  0.5f), Vec3(0, -1, 0), Vec2(1, 1), 255, 255, 255),
+				Vertex(Vec3( 0.5f, -0.5f, -0.5f), Vec3(0, -1, 0), Vec2(1, 0), 255, 255, 255),
+				Vertex(Vec3(-0.5f, -0.5f, -0.5f), Vec3(0, -1, 0), Vec2(0, 0), 255, 255, 255)
 			};
 			
 			// Indices for colored cube (24 vertices)

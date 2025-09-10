@@ -4,6 +4,11 @@
 #include "Math/Vec3.h"
 #include "Math/Vec4.h"
 #include "Graphics/VertexShader.h"
+#include "Lighting/Light.h"
+#include "Lighting/Material.h"
+#include "Lighting/LightingCalculations.h"
+#include <vector>
+#include <memory>
 
 // Forward declarations
 class Texture;
@@ -68,26 +73,33 @@ private:
     Texture* mTexture = nullptr;
 };
 
-// Simple lit fragment shader
+// Enhanced lit fragment shader with material and light support
 class LitFragmentShader : public FragmentShader {
+protected:
+    std::vector<std::shared_ptr<Light>> lights;
+    Material material;
+    Vec3 ambientLight;
+    Texture* albedoTexture;
+    
+public:
+    LitFragmentShader() 
+        : ambientLight(0.1f, 0.1f, 0.1f), 
+          albedoTexture(nullptr) {}
+    
+    // Setup functions
+    void SetMaterial(const Material& mat) { material = mat; }
+    void SetAmbientLight(const Vec3& ambient) { ambientLight = ambient; }
+    void SetAlbedoTexture(Texture* texture) { albedoTexture = texture; }
+    void AddLight(std::shared_ptr<Light> light) { lights.push_back(light); }
+    void ClearLights() { lights.clear(); }
+    
+    FragmentOutput Shade(const FragmentInput& input,
+                        const ShaderUniforms& uniforms) override;
+};
+
+// Textured lit fragment shader
+class TexturedLitFragmentShader : public LitFragmentShader {
 public:
     FragmentOutput Shade(const FragmentInput& input,
-                        const ShaderUniforms& /*uniforms*/) override {
-        FragmentOutput output;
-        
-        // Simple diffuse lighting
-        Vec3 lightDir = Vec3(0.5f, 1.0f, 0.5f).normalized();
-        float NdotL = std::max(0.0f, input.worldNormal.dot(lightDir));
-        
-        // Ambient + diffuse
-        Vec3 ambient = Vec3(0.2f, 0.2f, 0.2f);
-        Vec3 diffuse = Vec3(input.color.x, input.color.y, input.color.z) * NdotL;
-        
-        Vec3 finalColor = ambient + diffuse;
-        output.color = Vec4(finalColor.x, finalColor.y, finalColor.z, input.color.w);
-        output.depth = input.depth;
-        output.discard = false;
-        
-        return output;
-    }
+                        const ShaderUniforms& uniforms) override;
 };

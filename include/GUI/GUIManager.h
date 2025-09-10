@@ -19,6 +19,11 @@ struct RenderSettings {
     int cullMode = 1; // 0=None, 1=Back, 2=Front
     int textureFilter = 1; // 0=Nearest, 1=Bilinear, 2=Trilinear
     
+    // Lighting
+    bool enableLighting = true;
+    bool animateLight = true;
+    int shadingModel = 0; // 0=Phong, 1=Blinn-Phong, 2=Lambert
+    
     // Debug options
     bool enableDepthTest = true;
     bool enableScissor = false;
