@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude `pkg-config --cflags sdl3`
+CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude -Ithird_party/stb `pkg-config --cflags sdl3`
 LDFLAGS = `pkg-config --libs sdl3`
 
 # Directories
