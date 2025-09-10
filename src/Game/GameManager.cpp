@@ -47,6 +47,10 @@ GameManager::GameManager()
 	mCamera->lookAt(Vec3(0, 0, 0));  // Look at origin where cube is
 	mRenderer->SetCamera(mCamera);
 	
+	// Setup camera controller
+	mCameraController = new CameraController(mCamera);
+	mCameraController->SetControlMode(CameraController::FPS); // Start in FPS mode
+	
 	// Create demo cube
 	mCube = new Entity();
 	mRotation = 0.0f;
@@ -87,6 +91,7 @@ GameManager::GameManager()
 GameManager::~GameManager()
 {
 	delete mCube;
+	delete mCameraController;
 	delete mCamera;
 	delete mGUIManager;
 	Graphics::Release();
@@ -120,9 +125,21 @@ void GameManager::Run()
 				mGUIManager->ProcessEvent(mEvents);
 			}
 			
+			// Pass events to camera controller
+			mCameraController->HandleEvent(mEvents);
+			
 			// Toggle cube rotation with R key
 			if (mEvents.type == SDL_EVENT_KEY_DOWN && mEvents.key.key == SDLK_R) {
 				mRotateCube = !mRotateCube;
+			}
+			
+			// Switch camera modes with C key
+			if (mEvents.type == SDL_EVENT_KEY_DOWN && mEvents.key.key == SDLK_C) {
+				if (mCameraController->GetControlMode() == CameraController::FPS) {
+					mCameraController->SetControlMode(CameraController::ORBIT);
+				} else {
+					mCameraController->SetControlMode(CameraController::FPS);
+				}
 			}
 		}
 		if (mTimer->DeltaTime() > 1.0f / FRAME_RATE)
@@ -141,6 +158,9 @@ void GameManager::Run()
 				mFrameTime = 0.0f;
 				mFPSUpdateTime = 0.0f;
 			}
+			
+			// Update camera controller
+			mCameraController->Update(deltaTime);
 			
 			// Update rotation if enabled
 			if (mRotateCube) {
@@ -270,6 +290,7 @@ void GameManager::Run()
 			if (mRenderSettings.showAxis) {
 				mRenderer->DrawAxis(Mat4(), mRenderSettings.axisLength);
 			}
+			
 			
 			// Draw the colored cube
 			mRenderer->DrawVertexMesh(coloredCubeVertices, coloredCubeIndices,

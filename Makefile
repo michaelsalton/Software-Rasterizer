@@ -11,6 +11,7 @@ TEST_BUILD_DIR = build/tests
 SRCS = $(SRC_DIR)/Core/Main.cpp \
        $(SRC_DIR)/Core/Transform.cpp \
        $(SRC_DIR)/Core/Camera.cpp \
+       $(SRC_DIR)/Core/CameraController.cpp \
        $(SRC_DIR)/Graphics/Graphics.cpp \
        $(SRC_DIR)/Graphics/Renderer.cpp \
        $(SRC_DIR)/Graphics/Framebuffer.cpp \

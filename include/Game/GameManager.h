@@ -5,6 +5,7 @@
 #include "Game/Entity.h"
 #include "Graphics/Renderer.h"
 #include "GUI/GUIManager.h"
+#include "Core/CameraController.h"
 #include <memory>
 
 class GameManager
@@ -23,6 +24,7 @@ private:
 	
 	// Demo objects
 	class Camera* mCamera;
+	CameraController* mCameraController;
 	Entity* mCube;
 	float mRotation;
 	bool mRotateCube;  // Toggle for cube rotation
