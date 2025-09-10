@@ -218,19 +218,22 @@ void Renderer::DrawMesh(const std::vector<Vec3>& vertices, const std::vector<int
 
 void Renderer::DrawAxis(const Mat4& modelMatrix, float length)
 {
-    Vec3 origin(0, 0, 0);
-    Vec3 xAxis(length, 0, 0);
-    Vec3 yAxis(0, length, 0);
-    Vec3 zAxis(0, 0, length);
+    // Draw axes in both positive and negative directions
+    Vec3 xAxisPos(length, 0, 0);
+    Vec3 xAxisNeg(-length, 0, 0);
+    Vec3 yAxisPos(0, length, 0);
+    Vec3 yAxisNeg(0, -length, 0);
+    Vec3 zAxisPos(0, 0, length);
+    Vec3 zAxisNeg(0, 0, -length);
     
-    // X axis - Red
-    DrawLine(origin, xAxis, Framebuffer::Color(255, 0, 0), modelMatrix);
+    // X axis - Red (full line from -X to +X)
+    DrawLine(xAxisNeg, xAxisPos, Framebuffer::Color(255, 0, 0), modelMatrix);
     
-    // Y axis - Green
-    DrawLine(origin, yAxis, Framebuffer::Color(0, 255, 0), modelMatrix);
+    // Y axis - Green (full line from -Y to +Y)
+    DrawLine(yAxisNeg, yAxisPos, Framebuffer::Color(0, 255, 0), modelMatrix);
     
-    // Z axis - Blue
-    DrawLine(origin, zAxis, Framebuffer::Color(0, 0, 255), modelMatrix);
+    // Z axis - Blue (full line from -Z to +Z)
+    DrawLine(zAxisNeg, zAxisPos, Framebuffer::Color(0, 0, 255), modelMatrix);
 }
 
 void Renderer::DrawGrid(int size, float spacing, const Framebuffer::Color& color)

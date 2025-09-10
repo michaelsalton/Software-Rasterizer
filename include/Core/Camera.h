@@ -76,6 +76,7 @@ public:
     Vec3 getRight() const;
     Vec3 getUp() const;
     
+    
     // Ray from camera through normalized device coordinates
     Vec3 getRayDirection(float ndcX, float ndcY) const;
     

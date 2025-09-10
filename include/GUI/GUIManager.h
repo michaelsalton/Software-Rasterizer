@@ -12,6 +12,7 @@ struct RenderSettings {
     bool showWireframe = false;
     bool enableTextures = true;
     bool showFPS = true;
+    bool showAxis = true;
     
     // Render modes
     int fillMode = 0; // 0=Solid, 1=Wireframe, 2=Points
@@ -22,6 +23,7 @@ struct RenderSettings {
     bool enableDepthTest = true;
     bool enableScissor = false;
     float normalLength = 0.5f;
+    float axisLength = 2.0f;
     
     // Performance
     int rasterAlgorithm = 1; // 0=Scanline, 1=EdgeEquation, 2=Hierarchical

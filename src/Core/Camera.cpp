@@ -198,3 +198,4 @@ void Camera::updateProjectionMatrix() const {
     }
     projectionDirty = false;
 }
+

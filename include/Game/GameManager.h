@@ -25,6 +25,7 @@ private:
 	class Camera* mCamera;
 	Entity* mCube;
 	float mRotation;
+	bool mRotateCube;  // Toggle for cube rotation
 	
 	// FPS tracking
 	float mFPS;

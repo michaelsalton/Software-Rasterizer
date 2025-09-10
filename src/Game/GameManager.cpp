@@ -50,6 +50,7 @@ GameManager::GameManager()
 	// Create demo cube
 	mCube = new Entity();
 	mRotation = 0.0f;
+	mRotateCube = true;
 	
 	// Initialize FPS tracking
 	mFPS = 60.0f;  // Start with expected FPS
@@ -65,7 +66,7 @@ GameManager::GameManager()
 	
 	// Load texture from file
 	try {
-		mTestTexture = std::make_shared<Texture>("assets/textures/uvtest.png");
+		mTestTexture = std::make_shared<Texture>("assets/textures/checker.png");
 		printf("Loaded texture from file!\n");
 	} catch (const std::exception& e) {
 		printf("Failed to load texture: %s\n", e.what());
@@ -114,9 +115,14 @@ void GameManager::Run()
 				mQuit = true;
 			}
 			
-			// Pass events to GUI
+			// Pass events to GUI first (it should have priority)
 			if (mGUIManager) {
 				mGUIManager->ProcessEvent(mEvents);
+			}
+			
+			// Toggle cube rotation with R key
+			if (mEvents.type == SDL_EVENT_KEY_DOWN && mEvents.key.key == SDLK_R) {
+				mRotateCube = !mRotateCube;
 			}
 		}
 		if (mTimer->DeltaTime() > 1.0f / FRAME_RATE)
@@ -136,8 +142,10 @@ void GameManager::Run()
 				mFPSUpdateTime = 0.0f;
 			}
 			
-			// Update rotation
-			mRotation += 1.0f;
+			// Update rotation if enabled
+			if (mRotateCube) {
+				mRotation += 60.0f * deltaTime;  // 60 degrees per second
+			}
 			
 			// Start GUI frame
 			if (mGUIManager) {
@@ -257,6 +265,11 @@ void GameManager::Run()
 				Math::toRadians(mRotation * 0.3f)
 			);
 			mCube->GetTransform().setPosition(0, 0, 0); // Center of screen
+			
+			// Draw axis if enabled
+			if (mRenderSettings.showAxis) {
+				mRenderer->DrawAxis(Mat4(), mRenderSettings.axisLength);
+			}
 			
 			// Draw the colored cube
 			mRenderer->DrawVertexMesh(coloredCubeVertices, coloredCubeIndices,

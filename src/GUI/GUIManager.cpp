@@ -75,12 +75,16 @@ void GUIManager::DrawControlPanel(RenderSettings& settings) {
     if (ImGui::Begin("Render Controls", nullptr, ImGuiWindowFlags_NoCollapse)) {
         // Display options
         if (ImGui::CollapsingHeader("Display", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::Checkbox("Show Axis", &settings.showAxis);
             ImGui::Checkbox("Show Face Normals", &settings.showNormals);
             ImGui::Checkbox("Show Vertex Normals", &settings.showVertexNormals);
             ImGui::Checkbox("Show Wireframe Overlay", &settings.showWireframe);
             ImGui::Checkbox("Enable Textures", &settings.enableTextures);
             ImGui::Checkbox("Show FPS", &settings.showFPS);
             
+            if (settings.showAxis) {
+                ImGui::SliderFloat("Axis Length", &settings.axisLength, 0.5f, 5.0f);
+            }
             ImGui::SliderFloat("Normal Length", &settings.normalLength, 0.1f, 2.0f);
         }
         
@@ -113,6 +117,7 @@ void GUIManager::DrawControlPanel(RenderSettings& settings) {
             ImGui::Separator();
             ImGui::Text("Mouse Pos: (%.0f, %.0f)", io.MousePos.x, io.MousePos.y);
         }
+        
     }
     ImGui::End();
 }
