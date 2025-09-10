@@ -7,6 +7,16 @@
 #include <algorithm>
 #include <functional>
 
+// Scissor rectangle for clipping
+struct ScissorRect {
+    int left, top, right, bottom;
+    bool enabled;
+    
+    ScissorRect() : left(0), top(0), right(0), bottom(0), enabled(false) {}
+    ScissorRect(int l, int t, int r, int b, bool e = true) 
+        : left(l), top(t), right(r), bottom(b), enabled(e) {}
+};
+
 // Edge equation for half-space testing
 struct EdgeEquation {
     float a, b, c;  // ax + by + c = 0
@@ -54,7 +64,8 @@ struct TriangleSetup {
     float area2;
     
     // Setup triangle for rasterization
-    void setup(const Vec3& p0, const Vec3& p1, const Vec3& p2, int screenWidth, int screenHeight) {
+    void setup(const Vec3& p0, const Vec3& p1, const Vec3& p2, int screenWidth, int screenHeight, 
+               const ScissorRect* scissor = nullptr) {
         v0 = p0;
         v1 = p1;
         v2 = p2;
@@ -72,6 +83,14 @@ struct TriangleSetup {
         minY = std::max(0, (int)std::min({v0.y, v1.y, v2.y}));
         maxX = std::min(screenWidth - 1, (int)std::max({v0.x, v1.x, v2.x}));
         maxY = std::min(screenHeight - 1, (int)std::max({v0.y, v1.y, v2.y}));
+        
+        // Apply scissor rect if enabled
+        if (scissor && scissor->enabled) {
+            minX = std::max(minX, scissor->left);
+            minY = std::max(minY, scissor->top);
+            maxX = std::min(maxX, scissor->right);
+            maxY = std::min(maxY, scissor->bottom);
+        }
     }
     
     // Check if triangle is degenerate or back-facing
@@ -102,21 +121,24 @@ public:
         const TransformedVertex& v1,
         const TransformedVertex& v2,
         Framebuffer* framebuffer,
-        Algorithm algorithm = Algorithm::EDGE_EQUATION);
+        Algorithm algorithm = Algorithm::EDGE_EQUATION,
+        const ::ScissorRect* scissor = nullptr);
     
     // Edge equation-based rasterization
     static void RasterizeTriangleEdgeEquation(
         const TransformedVertex& v0,
         const TransformedVertex& v1,
         const TransformedVertex& v2,
-        Framebuffer* framebuffer);
+        Framebuffer* framebuffer,
+        const ::ScissorRect* scissor = nullptr);
     
     // Scanline rasterization (existing method)
     static void RasterizeTriangleScanline(
         const TransformedVertex& v0,
         const TransformedVertex& v1,
         const TransformedVertex& v2,
-        Framebuffer* framebuffer);
+        Framebuffer* framebuffer,
+        const ::ScissorRect* scissor = nullptr);
     
     // Hierarchical rasterization with tiles
     static void RasterizeTriangleHierarchical(
@@ -124,7 +146,8 @@ public:
         const TransformedVertex& v1,
         const TransformedVertex& v2,
         Framebuffer* framebuffer,
-        int tileSize = 8);
+        int tileSize = 8,
+        const ::ScissorRect* scissor = nullptr);
     
     // Compute optimized barycentric coordinates using edge equations
     static Vec3 ComputeBarycentricFast(float x, float y, const TriangleSetup& setup);

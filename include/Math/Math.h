@@ -159,9 +159,9 @@ inline Vec3 rotateEuler(const Vec3& v, float xRad, float yRad, float zRad) {
 }
 
 // Look-at rotation (align vector to point at target)
-inline Vec3 lookAt(const Vec3& from, const Vec3& to, const Vec3& up = Vec3(0, 1, 0)) {
+inline Vec3 lookAt(const Vec3& from, const Vec3& to, const Vec3& /*up*/ = Vec3(0, 1, 0)) {
     Vec3 forward = (to - from).normalized();
-    Vec3 right = up.cross(forward).normalized();
+    // Vec3 right = up.cross(forward).normalized(); // For future use with rotation matrix
     // Vec3 newUp = forward.cross(right); // For future use with rotation matrix
     return forward; // Return forward direction, can be extended to return full rotation matrix
 }

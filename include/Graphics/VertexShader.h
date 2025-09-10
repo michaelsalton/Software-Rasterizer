@@ -19,7 +19,7 @@ public:
     virtual TransformedVertex Process(const Vertex& input, const ShaderUniforms& uniforms) = 0;
     
     // Optional: Called once before processing a batch of vertices
-    virtual void BeginBatch(const ShaderUniforms& uniforms) {}
+    virtual void BeginBatch(const ShaderUniforms& /*uniforms*/) {}
     
     // Optional: Called after processing a batch of vertices
     virtual void EndBatch() {}
@@ -92,9 +92,8 @@ struct ShaderUniforms {
         modelViewMatrix = viewMatrix * modelMatrix;
         mvpMatrix = projectionMatrix * modelViewMatrix;
         
-        // For proper normal transformation, we need inverse transpose
-        // For now, we'll use the regular matrix (works for uniform scaling)
-        normalMatrix = modelMatrix;
+        // Calculate proper normal matrix (inverse transpose of model matrix)
+        normalMatrix = modelMatrix.normalMatrix();
     }
 };
 

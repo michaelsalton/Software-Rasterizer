@@ -73,7 +73,7 @@ namespace VertexProcessor {
                              const Mat4& projectionMatrix);
     
     // Transform normal from object space to world space
-    Vec3 TransformNormal(const Vec3& normal, const Mat4& modelMatrix);
+    Vec3 TransformNormal(const Vec3& normal, const Mat4& normalMatrix);
     
     // Perform perspective divide and viewport transformation
     Vec3 ClipToScreen(const Vec4& clipPos, int viewportWidth, int viewportHeight);

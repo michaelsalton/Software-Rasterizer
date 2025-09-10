@@ -6,17 +6,18 @@ void Rasterizer::RasterizeTriangle(
     const TransformedVertex& v1,
     const TransformedVertex& v2,
     Framebuffer* framebuffer,
-    Algorithm algorithm) {
+    Algorithm algorithm,
+    const ::ScissorRect* scissor) {
     
     switch (algorithm) {
         case Algorithm::SCANLINE:
-            RasterizeTriangleScanline(v0, v1, v2, framebuffer);
+            RasterizeTriangleScanline(v0, v1, v2, framebuffer, scissor);
             break;
         case Algorithm::EDGE_EQUATION:
-            RasterizeTriangleEdgeEquation(v0, v1, v2, framebuffer);
+            RasterizeTriangleEdgeEquation(v0, v1, v2, framebuffer, scissor);
             break;
         case Algorithm::HIERARCHICAL:
-            RasterizeTriangleHierarchical(v0, v1, v2, framebuffer);
+            RasterizeTriangleHierarchical(v0, v1, v2, framebuffer, 8, scissor);
             break;
     }
 }
@@ -25,12 +26,13 @@ void Rasterizer::RasterizeTriangleEdgeEquation(
     const TransformedVertex& v0,
     const TransformedVertex& v1,
     const TransformedVertex& v2,
-    Framebuffer* framebuffer) {
+    Framebuffer* framebuffer,
+    const ::ScissorRect* scissor) {
     
     // Setup triangle
     TriangleSetup setup;
     setup.setup(v0.screenPosition, v1.screenPosition, v2.screenPosition, 
-                framebuffer->getWidth(), framebuffer->getHeight());
+                framebuffer->getWidth(), framebuffer->getHeight(), scissor);
     
     // Skip degenerate triangles
     if (!setup.isValid()) {
@@ -62,7 +64,8 @@ void Rasterizer::RasterizeTriangleScanline(
     const TransformedVertex& v0,
     const TransformedVertex& v1,
     const TransformedVertex& v2,
-    Framebuffer* framebuffer) {
+    Framebuffer* framebuffer,
+    const ::ScissorRect* scissor) {
     
     // Get screen positions
     Vec3 p0 = v0.screenPosition;
@@ -88,6 +91,7 @@ void Rasterizer::RasterizeTriangleScanline(
     if (p1.y - p0.y > 0) {
         for (int y = (int)p0.y; y <= (int)p1.y; y++) {
             if (y < 0 || y >= framebuffer->getHeight()) continue;
+            if (scissor && scissor->enabled && (y < scissor->top || y > scissor->bottom)) continue;
             
             float t = (y - p0.y) / (p1.y - p0.y);
             int x1 = (int)(p0.x + (y - p0.y) * invSlope1);
@@ -97,6 +101,7 @@ void Rasterizer::RasterizeTriangleScanline(
             
             for (int x = x1; x <= x2; x++) {
                 if (x < 0 || x >= framebuffer->getWidth()) continue;
+                if (scissor && scissor->enabled && (x < scissor->left || x > scissor->right)) continue;
                 
                 // Compute barycentric coordinates
                 Vec3 bary = ComputeBarycentric(
@@ -120,6 +125,7 @@ void Rasterizer::RasterizeTriangleScanline(
     if (p2.y - p1.y > 0) {
         for (int y = (int)p1.y + 1; y <= (int)p2.y; y++) {
             if (y < 0 || y >= framebuffer->getHeight()) continue;
+            if (scissor && scissor->enabled && (y < scissor->top || y > scissor->bottom)) continue;
             
             int x1 = (int)(p1.x + (y - p1.y) * invSlope1);
             int x2 = (int)(p0.x + (y - p0.y) * invSlope2);
@@ -128,6 +134,7 @@ void Rasterizer::RasterizeTriangleScanline(
             
             for (int x = x1; x <= x2; x++) {
                 if (x < 0 || x >= framebuffer->getWidth()) continue;
+                if (scissor && scissor->enabled && (x < scissor->left || x > scissor->right)) continue;
                 
                 // Compute barycentric coordinates
                 Vec3 bary = ComputeBarycentric(
@@ -148,12 +155,13 @@ void Rasterizer::RasterizeTriangleHierarchical(
     const TransformedVertex& v1,
     const TransformedVertex& v2,
     Framebuffer* framebuffer,
-    int tileSize) {
+    int tileSize,
+    const ::ScissorRect* scissor) {
     
     // Setup triangle
     TriangleSetup setup;
     setup.setup(v0.screenPosition, v1.screenPosition, v2.screenPosition,
-                framebuffer->getWidth(), framebuffer->getHeight());
+                framebuffer->getWidth(), framebuffer->getHeight(), scissor);
     
     if (!setup.isValid()) {
         return;

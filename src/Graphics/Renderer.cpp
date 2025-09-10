@@ -5,7 +5,8 @@
 #include <cmath>
 
 Renderer::Renderer(SDL_Renderer* renderer, int width, int height) 
-    : mRenderer(renderer), width(width), height(height), camera(nullptr) {
+    : mRenderer(renderer), mTexture(nullptr), framebuffer(nullptr), camera(nullptr), 
+      width(width), height(height) {
     framebuffer = new Framebuffer(width, height);
     
     // Create texture for presenting framebuffer
@@ -468,10 +469,45 @@ void Renderer::DrawVertexTriangle(const Vertex& v0, const Vertex& v1, const Vert
     }
 }
 
+void Renderer::DrawWireframeVertexTriangle(const TransformedVertex& v0, const TransformedVertex& v1, const TransformedVertex& v2)
+{
+    // Draw triangle edges with depth testing
+    framebuffer->drawLine(
+        v0.screenPosition.x, v0.screenPosition.y,
+        v1.screenPosition.x, v1.screenPosition.y,
+        v0.color, v0.screenPosition.z, v1.screenPosition.z, 
+        pipelineState.depthStencil.depthEnable
+    );
+    framebuffer->drawLine(
+        v1.screenPosition.x, v1.screenPosition.y,
+        v2.screenPosition.x, v2.screenPosition.y,
+        v1.color, v1.screenPosition.z, v2.screenPosition.z,
+        pipelineState.depthStencil.depthEnable
+    );
+    framebuffer->drawLine(
+        v2.screenPosition.x, v2.screenPosition.y,
+        v0.screenPosition.x, v0.screenPosition.y,
+        v2.color, v2.screenPosition.z, v0.screenPosition.z,
+        pipelineState.depthStencil.depthEnable
+    );
+}
+
 void Renderer::DrawFilledVertexTriangle(const TransformedVertex& v0, const TransformedVertex& v1, const TransformedVertex& v2)
 {
+    // Create scissor rect if enabled
+    ScissorRect* scissor = nullptr;
+    ScissorRect scissorRect;
+    if (pipelineState.rasterizer.scissorEnable) {
+        scissorRect.enabled = true;
+        scissorRect.left = pipelineState.rasterizer.scissorRect.left;
+        scissorRect.top = pipelineState.rasterizer.scissorRect.top;
+        scissorRect.right = pipelineState.rasterizer.scissorRect.right;
+        scissorRect.bottom = pipelineState.rasterizer.scissorRect.bottom;
+        scissor = &scissorRect;
+    }
+    
     // Use the selected rasterization algorithm
-    Rasterizer::RasterizeTriangle(v0, v1, v2, framebuffer, rasterAlgorithm);
+    Rasterizer::RasterizeTriangle(v0, v1, v2, framebuffer, rasterAlgorithm, scissor);
     return;
     
     // Keep old implementation below for reference (will be removed later)
@@ -640,8 +676,23 @@ void Renderer::DrawClippedPolygon(const std::vector<TransformedVertex>& polygon)
         const TransformedVertex& v1 = screenPolygon[i];
         const TransformedVertex& v2 = screenPolygon[i + 1];
         
-        // Draw the triangle
-        DrawFilledVertexTriangle(v0, v1, v2);
+        // Draw based on fill mode
+        switch (pipelineState.rasterizer.fillMode) {
+            case FillMode::SOLID:
+                DrawFilledVertexTriangle(v0, v1, v2);
+                break;
+                
+            case FillMode::WIREFRAME:
+                DrawWireframeVertexTriangle(v0, v1, v2);
+                break;
+                
+            case FillMode::POINT:
+                // Draw vertices as points
+                framebuffer->writePixel(v0.screenPosition.x, v0.screenPosition.y, v0.color, v0.screenPosition.z, pipelineState.depthStencil.depthEnable);
+                framebuffer->writePixel(v1.screenPosition.x, v1.screenPosition.y, v1.color, v1.screenPosition.z, pipelineState.depthStencil.depthEnable);
+                framebuffer->writePixel(v2.screenPosition.x, v2.screenPosition.y, v2.color, v2.screenPosition.z, pipelineState.depthStencil.depthEnable);
+                break;
+        }
     }
 }
 
@@ -650,7 +701,6 @@ void Renderer::DrawPrimitives(const std::vector<Vertex>& vertices, PrimitiveType
         vertexShader = std::make_shared<DefaultVertexShader>();
     }
     
-    Camera* cam = camera ? camera : &defaultCamera;
     UpdateShaderUniforms(modelMatrix);
     
     // Transform all vertices
@@ -683,7 +733,6 @@ void Renderer::DrawIndexedPrimitives(const std::vector<Vertex>& vertices, const 
         vertexShader = std::make_shared<DefaultVertexShader>();
     }
     
-    Camera* cam = camera ? camera : &defaultCamera;
     UpdateShaderUniforms(modelMatrix);
     
     // Transform all vertices
@@ -708,4 +757,21 @@ void Renderer::DrawIndexedPrimitives(const std::vector<Vertex>& vertices, const 
             DrawClippedPolygon(clippedPolygon);
         }
     }
+}
+
+void Renderer::SetPipelineState(const PipelineState& state) {
+    pipelineState = state;
+    
+    // Apply rasterizer state to primitive assembler
+    primitiveAssembler.SetCullMode(state.rasterizer.cullMode);
+    primitiveAssembler.SetWindingOrder(state.rasterizer.frontFace);
+    
+    // Other state will be used during rendering
+}
+
+void Renderer::SetScissorRect(int left, int top, int right, int bottom) {
+    pipelineState.rasterizer.scissorRect.left = left;
+    pipelineState.rasterizer.scissorRect.top = top;
+    pipelineState.rasterizer.scissorRect.right = right;
+    pipelineState.rasterizer.scissorRect.bottom = bottom;
 }

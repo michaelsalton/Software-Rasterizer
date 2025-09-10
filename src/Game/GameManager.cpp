@@ -80,6 +80,10 @@ void GameManager::Run()
 			// Set culling mode to back-face culling
 			mRenderer->SetCullMode(CullMode::BACK);
 			
+			// Test scissor rect (uncomment to test scissor functionality)
+			// mRenderer->SetScissorTest(true);
+			// mRenderer->SetScissorRect(100, 100, Graphics::WINDOW_WIDTH - 100, Graphics::WINDOW_HEIGHT - 100);
+			
 			// Create colored cube vertices - each face has a different solid color
 			std::vector<Vertex> coloredCubeVertices = {
 				// Front face - Red

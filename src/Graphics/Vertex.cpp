@@ -41,10 +41,10 @@ Vec4 TransformToClipSpace(const Vec3& position,
     return projectionMatrix * viewPos;
 }
 
-Vec3 TransformNormal(const Vec3& normal, const Mat4& modelMatrix) {
-    // Transform normal without translation
-    // Note: This should use inverse transpose for non-uniform scaling
-    Vec3 transformedNormal = modelMatrix.transformDirection(normal);
+Vec3 TransformNormal(const Vec3& normal, const Mat4& normalMatrix) {
+    // Transform normal using the normal matrix (inverse transpose of model matrix)
+    // This correctly handles non-uniform scaling
+    Vec3 transformedNormal = normalMatrix.transformDirection(normal);
     return transformedNormal.normalized();
 }
 

@@ -371,6 +371,18 @@ public:
     Vec3 extractTranslation() const {
         return Vec3(m[12], m[13], m[14]);
     }
+    
+    // Calculate normal matrix (inverse transpose of upper 3x3)
+    Mat4 normalMatrix() const {
+        // Extract upper 3x3 portion for rotation/scale
+        Mat4 upper3x3 = *this;
+        upper3x3.m[3] = upper3x3.m[7] = upper3x3.m[11] = 0.0f;
+        upper3x3.m[12] = upper3x3.m[13] = upper3x3.m[14] = 0.0f;
+        upper3x3.m[15] = 1.0f;
+        
+        // Calculate inverse transpose
+        return upper3x3.inverse().transpose();
+    }
 
     // Decompose transformation matrix into translation, rotation, and scale
     void decompose(Vec3& translation, Mat4& rotation, Vec3& scale) const {

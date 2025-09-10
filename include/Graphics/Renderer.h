@@ -12,6 +12,7 @@
 #include "Graphics/Clipper.h"
 #include "Graphics/PrimitiveAssembler.h"
 #include "Graphics/Rasterizer.h"
+#include "Graphics/PipelineState.h"
 #include "Core/Camera.h"
 
 class Renderer
@@ -67,6 +68,17 @@ public:
 	void SetRasterizationAlgorithm(Rasterizer::Algorithm algorithm) { rasterAlgorithm = algorithm; }
 	Rasterizer::Algorithm GetRasterizationAlgorithm() const { return rasterAlgorithm; }
 	
+	// Pipeline state management
+	void SetPipelineState(const PipelineState& state);
+	const PipelineState& GetPipelineState() const { return pipelineState; }
+	
+	// Quick state setters (for convenience)
+	void SetFillMode(FillMode mode) { pipelineState.rasterizer.fillMode = mode; }
+	void SetDepthTest(bool enable) { pipelineState.depthStencil.depthEnable = enable; }
+	void SetDepthWrite(bool enable) { pipelineState.depthStencil.depthWriteEnable = enable; }
+	void SetScissorTest(bool enable) { pipelineState.rasterizer.scissorEnable = enable; }
+	void SetScissorRect(int left, int top, int right, int bottom);
+	
 	// Debug visualization
 	void DrawAxis(const Mat4& modelMatrix = Mat4(), float length = 1.0f);
 	void DrawGrid(int size = 10, float spacing = 1.0f, const Framebuffer::Color& color = Framebuffer::Color(128, 128, 128));
@@ -97,6 +109,9 @@ private:
 	// Rasterization algorithm
 	Rasterizer::Algorithm rasterAlgorithm = Rasterizer::Algorithm::EDGE_EQUATION;
 	
+	// Pipeline state
+	PipelineState pipelineState;
+	
 	// Helper functions
 	int Interpolate(int y1, int y2, int x1, int x2, int y);
 	float InterpolateFloat(float y1, float y2, float x1, float x2, float y);
@@ -109,6 +124,7 @@ private:
 	
 	// Vertex attribute interpolation for rasterization
 	void DrawFilledVertexTriangle(const TransformedVertex& v0, const TransformedVertex& v1, const TransformedVertex& v2);
+	void DrawWireframeVertexTriangle(const TransformedVertex& v0, const TransformedVertex& v1, const TransformedVertex& v2);
 	void DrawClippedPolygon(const std::vector<TransformedVertex>& polygon);
 	void RasterizeScanline(int y, int x1, int x2, const TransformedVertex& v0, const TransformedVertex& v1, const TransformedVertex& v2, const Vec3& screenPos0, const Vec3& screenPos1, const Vec3& screenPos2);
 };
