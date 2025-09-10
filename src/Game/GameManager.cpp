@@ -3,6 +3,9 @@
 #include "Core/Camera.h"
 #include "Graphics/Vertex.h"
 #include "Graphics/VertexShader.h"
+#include "Graphics/FragmentShader.h"
+#include "Graphics/Texture.h"
+#include "Graphics/TextureGenerator.h"
 #include <cmath>
 #include <cstdio>
 
@@ -44,6 +47,31 @@ GameManager::GameManager()
 	mFrameTime = 0.0f;
 	mFrameCount = 0;
 	mFPSUpdateTime = 0.0f;
+	
+	// Create test texture
+	// Try different texture patterns - uncomment one to test
+	// mTestTexture = TextureGenerator::CreateCheckerboard(256, 32);
+	// mTestTexture = TextureGenerator::CreateGradient(256, 256);
+	// mTestTexture = TextureGenerator::CreateDebugGrid(256, 32);
+	
+	// Load texture from file
+	try {
+		mTestTexture = std::make_shared<Texture>("assets/textures/uvtest.png");
+		printf("Loaded texture from file!\n");
+	} catch (const std::exception& e) {
+		printf("Failed to load texture: %s\n", e.what());
+		printf("Using procedural texture instead.\n");
+		mTestTexture = TextureGenerator::CreateDebugGrid(256, 32);
+	}
+	
+	mTestTexture->SetFilter(TextureFilter::BILINEAR);
+	mTestTexture->SetWrapU(TextureWrap::REPEAT);
+	mTestTexture->SetWrapV(TextureWrap::REPEAT);
+	mTestTexture->GenerateMipmaps();
+	
+	// Create textured fragment shader
+	mTexturedShader = std::make_shared<TexturedFragmentShader>();
+	mTexturedShader->SetTexture(mTestTexture.get());
 }
 
 GameManager::~GameManager()
@@ -100,6 +128,11 @@ void GameManager::Run()
 			
 			// Set culling mode to back-face culling
 			mRenderer->SetCullMode(CullMode::BACK);
+			
+			// Enable fragment shader for textured rendering
+			// Toggle comment to see colored cube without textures
+			mRenderer->SetFragmentShader(mTexturedShader);
+			// mRenderer->SetFragmentShader(nullptr);
 			
 			// Test scissor rect (uncomment to test scissor functionality)
 			// mRenderer->SetScissorTest(true);

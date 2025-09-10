@@ -4,6 +4,7 @@
 #include "Utils/Timer.h"
 #include "Game/Entity.h"
 #include "Graphics/Renderer.h"
+#include <memory>
 
 class GameManager
 {
@@ -29,6 +30,10 @@ private:
 	float mFrameTime;
 	int mFrameCount;
 	float mFPSUpdateTime;
+	
+	// Texture demo
+	std::shared_ptr<class Texture> mTestTexture;
+	std::shared_ptr<class TexturedFragmentShader> mTexturedShader;
 
 public:
 	static void Release();

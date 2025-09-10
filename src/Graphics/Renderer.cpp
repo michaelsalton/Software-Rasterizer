@@ -21,8 +21,9 @@ Renderer::Renderer(SDL_Renderer* renderer, int width, int height)
     defaultCamera.setPosition(0, 0, 5);
     defaultCamera.lookAt(Vec3(0, 0, 0));
     
-    // Initialize vertex shader system
+    // Initialize shader system
     vertexShader = std::make_shared<DefaultVertexShader>();
+    fragmentShader = std::make_shared<DefaultFragmentShader>();
     shaderUniforms.viewportWidth = width;
     shaderUniforms.viewportHeight = height;
 }
@@ -507,8 +508,12 @@ void Renderer::DrawFilledVertexTriangle(const TransformedVertex& v0, const Trans
         scissor = &scissorRect;
     }
     
-    // Use the selected rasterization algorithm
-    Rasterizer::RasterizeTriangle(v0, v1, v2, framebuffer, rasterAlgorithm, scissor);
+    // Use fragment shader if available, otherwise use standard rasterization
+    if (fragmentShader) {
+        Rasterizer::RasterizeTriangleWithShader(v0, v1, v2, framebuffer, fragmentShader.get(), shaderUniforms, rasterAlgorithm, scissor);
+    } else {
+        Rasterizer::RasterizeTriangle(v0, v1, v2, framebuffer, rasterAlgorithm, scissor);
+    }
     return;
     
     // Keep old implementation below for reference (will be removed later)

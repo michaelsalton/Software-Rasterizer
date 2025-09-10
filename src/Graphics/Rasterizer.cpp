@@ -1,4 +1,5 @@
 #include "Graphics/Rasterizer.h"
+#include "Graphics/FragmentShader.h"
 #include <cmath>
 
 void Rasterizer::RasterizeTriangle(
@@ -93,7 +94,7 @@ void Rasterizer::RasterizeTriangleScanline(
             if (y < 0 || y >= framebuffer->getHeight()) continue;
             if (scissor && scissor->enabled && (y < scissor->top || y > scissor->bottom)) continue;
             
-            float t = (y - p0.y) / (p1.y - p0.y);
+            // float t = (y - p0.y) / (p1.y - p0.y);
             int x1 = (int)(p0.x + (y - p0.y) * invSlope1);
             int x2 = (int)(p0.x + (y - p0.y) * invSlope2);
             
@@ -268,6 +269,135 @@ void Rasterizer::RasterizePixel(
     
     // Write pixel with depth test
     framebuffer->writePixel(x, y, interpolated.color, interpolated.screenPosition.z, true);
+}
+
+void Rasterizer::RasterizeTriangleWithShader(
+    const TransformedVertex& v0,
+    const TransformedVertex& v1,
+    const TransformedVertex& v2,
+    Framebuffer* framebuffer,
+    FragmentShader* shader,
+    const ShaderUniforms& uniforms,
+    Algorithm algorithm,
+    const ::ScissorRect* scissor) {
+    
+    switch (algorithm) {
+        case Algorithm::EDGE_EQUATION:
+            RasterizeTriangleEdgeEquationWithShader(v0, v1, v2, framebuffer, shader, uniforms, scissor);
+            break;
+        default:
+            // Fall back to edge equation for now
+            RasterizeTriangleEdgeEquationWithShader(v0, v1, v2, framebuffer, shader, uniforms, scissor);
+            break;
+    }
+}
+
+void Rasterizer::RasterizeTriangleEdgeEquationWithShader(
+    const TransformedVertex& v0,
+    const TransformedVertex& v1,
+    const TransformedVertex& v2,
+    Framebuffer* framebuffer,
+    FragmentShader* shader,
+    const ShaderUniforms& uniforms,
+    const ::ScissorRect* scissor) {
+    
+    // Setup triangle
+    TriangleSetup setup;
+    setup.setup(v0.screenPosition, v1.screenPosition, v2.screenPosition, 
+                framebuffer->getWidth(), framebuffer->getHeight(), scissor);
+    
+    // Skip degenerate triangles
+    if (!setup.isValid()) {
+        return;
+    }
+    
+    // Perspective-correct interpolation setup
+    float w0_inv = 1.0f / v0.clipPosition.w;
+    float w1_inv = 1.0f / v1.clipPosition.w;
+    float w2_inv = 1.0f / v2.clipPosition.w;
+    
+    // Iterate through all pixels in bounding box
+    for (int y = setup.minY; y <= setup.maxY; y++) {
+        for (int x = setup.minX; x <= setup.maxX; x++) {
+            // Test if pixel center is inside all three edges
+            float px = x + 0.5f;
+            float py = y + 0.5f;
+            
+            if (setup.edge0.inside(px, py) && 
+                setup.edge1.inside(px, py) && 
+                setup.edge2.inside(px, py)) {
+                
+                // Compute barycentric coordinates
+                Vec3 bary = ComputeBarycentricFast(px, py, setup);
+                
+                // Skip invalid coordinates
+                if (bary.x < 0 || bary.y < 0 || bary.z < 0) {
+                    continue;
+                }
+                
+                // Perspective-correct interpolation
+                float w0 = bary.x * w0_inv;
+                float w1 = bary.y * w1_inv;
+                float w2 = bary.z * w2_inv;
+                float w_sum = w0 + w1 + w2;
+                
+                // Setup fragment input
+                FragmentInput fragInput;
+                fragInput.screenPos = Vec2(x, y);
+                
+                // Interpolate depth
+                fragInput.depth = (v0.screenPosition.z * w0 + 
+                                  v1.screenPosition.z * w1 + 
+                                  v2.screenPosition.z * w2) / w_sum;
+                
+                // Interpolate world position
+                fragInput.worldPos = (v0.worldPosition * w0 + 
+                                     v1.worldPosition * w1 + 
+                                     v2.worldPosition * w2) * (1.0f / w_sum);
+                
+                // Interpolate world normal
+                fragInput.worldNormal = (v0.worldNormal * w0 + 
+                                        v1.worldNormal * w1 + 
+                                        v2.worldNormal * w2) * (1.0f / w_sum);
+                fragInput.worldNormal.normalize();
+                
+                // Interpolate texture coordinates
+                fragInput.texCoord = Vec2(
+                    (v0.texCoord.x * w0 + v1.texCoord.x * w1 + v2.texCoord.x * w2) / w_sum,
+                    (v0.texCoord.y * w0 + v1.texCoord.y * w1 + v2.texCoord.y * w2) / w_sum
+                );
+                
+                // Interpolate color and convert to [0,1] range
+                Framebuffer::Color c0 = v0.color;
+                Framebuffer::Color c1 = v1.color;
+                Framebuffer::Color c2 = v2.color;
+                
+                float r = (c0.r * w0 + c1.r * w1 + c2.r * w2) / w_sum / 255.0f;
+                float g = (c0.g * w0 + c1.g * w1 + c2.g * w2) / w_sum / 255.0f;
+                float b = (c0.b * w0 + c1.b * w1 + c2.b * w2) / w_sum / 255.0f;
+                float a = (c0.a * w0 + c1.a * w1 + c2.a * w2) / w_sum / 255.0f;
+                
+                fragInput.color = Vec4(r, g, b, a);
+                
+                // Run fragment shader
+                FragmentOutput fragOutput = shader->Shade(fragInput, uniforms);
+                
+                // Apply fragment shader output
+                if (!fragOutput.discard) {
+                    // Convert color back to 8-bit
+                    Framebuffer::Color finalColor(
+                        static_cast<uint8_t>(std::max(0.0f, std::min(1.0f, fragOutput.color.x)) * 255),
+                        static_cast<uint8_t>(std::max(0.0f, std::min(1.0f, fragOutput.color.y)) * 255),
+                        static_cast<uint8_t>(std::max(0.0f, std::min(1.0f, fragOutput.color.z)) * 255),
+                        static_cast<uint8_t>(std::max(0.0f, std::min(1.0f, fragOutput.color.w)) * 255)
+                    );
+                    
+                    // writePixel will handle depth testing
+                    framebuffer->writePixel(x, y, finalColor, fragOutput.depth, true);
+                }
+            }
+        }
+    }
 }
 
 bool Rasterizer::TileOverlapsTriangle(

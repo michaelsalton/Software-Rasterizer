@@ -20,6 +20,9 @@ SRCS = $(SRC_DIR)/Core/Main.cpp \
        $(SRC_DIR)/Graphics/PrimitiveAssembler.cpp \
        $(SRC_DIR)/Graphics/Rasterizer.cpp \
        $(SRC_DIR)/Graphics/BitmapFont.cpp \
+       $(SRC_DIR)/Graphics/Texture.cpp \
+       $(SRC_DIR)/Graphics/FragmentShader.cpp \
+       $(SRC_DIR)/Graphics/TextureGenerator.cpp \
        $(SRC_DIR)/Game/GameManager.cpp \
        $(SRC_DIR)/Game/Entity.cpp \
        $(SRC_DIR)/Utils/Timer.cpp \

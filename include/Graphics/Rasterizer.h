@@ -4,6 +4,8 @@
 #include "Math/Vec3.h"
 #include "Graphics/Vertex.h"
 #include "Graphics/Framebuffer.h"
+#include "Graphics/FragmentShader.h"
+#include "Graphics/VertexShader.h"
 #include <algorithm>
 #include <functional>
 
@@ -124,12 +126,33 @@ public:
         Algorithm algorithm = Algorithm::EDGE_EQUATION,
         const ::ScissorRect* scissor = nullptr);
     
+    // Rasterization with fragment shader
+    static void RasterizeTriangleWithShader(
+        const TransformedVertex& v0,
+        const TransformedVertex& v1,
+        const TransformedVertex& v2,
+        Framebuffer* framebuffer,
+        FragmentShader* shader,
+        const ShaderUniforms& uniforms,
+        Algorithm algorithm = Algorithm::EDGE_EQUATION,
+        const ::ScissorRect* scissor = nullptr);
+    
     // Edge equation-based rasterization
     static void RasterizeTriangleEdgeEquation(
         const TransformedVertex& v0,
         const TransformedVertex& v1,
         const TransformedVertex& v2,
         Framebuffer* framebuffer,
+        const ::ScissorRect* scissor = nullptr);
+    
+    // Edge equation-based rasterization with shader
+    static void RasterizeTriangleEdgeEquationWithShader(
+        const TransformedVertex& v0,
+        const TransformedVertex& v1,
+        const TransformedVertex& v2,
+        Framebuffer* framebuffer,
+        FragmentShader* shader,
+        const ShaderUniforms& uniforms,
         const ::ScissorRect* scissor = nullptr);
     
     // Scanline rasterization (existing method)

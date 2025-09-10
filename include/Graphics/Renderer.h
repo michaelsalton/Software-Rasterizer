@@ -9,6 +9,7 @@
 #include "Graphics/Framebuffer.h"
 #include "Graphics/Vertex.h"
 #include "Graphics/VertexShader.h"
+#include "Graphics/FragmentShader.h"
 #include "Graphics/Clipper.h"
 #include "Graphics/PrimitiveAssembler.h"
 #include "Graphics/Rasterizer.h"
@@ -49,6 +50,8 @@ public:
 	// Shader-based rendering
 	void SetVertexShader(std::shared_ptr<VertexShader> shader) { vertexShader = shader; }
 	std::shared_ptr<VertexShader> GetVertexShader() { return vertexShader; }
+	void SetFragmentShader(std::shared_ptr<FragmentShader> shader) { fragmentShader = shader; }
+	std::shared_ptr<FragmentShader> GetFragmentShader() { return fragmentShader; }
 	void DrawVertexMeshShaded(const std::vector<Vertex>& vertices, const std::vector<int>& indices, const Mat4& modelMatrix = Mat4(), bool wireframe = false);
 	
 	// Shader uniforms
@@ -102,8 +105,9 @@ private:
 	// Default camera if none is set
 	Camera defaultCamera;
 	
-	// Vertex shader system
+	// Shader system
 	std::shared_ptr<VertexShader> vertexShader;
+	std::shared_ptr<FragmentShader> fragmentShader;
 	ShaderUniforms shaderUniforms;
 	
 	// Primitive assembly
