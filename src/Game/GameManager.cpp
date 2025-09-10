@@ -31,6 +31,14 @@ GameManager::GameManager()
 	mTimer = Timer::Instance();
 	mRenderer = new Renderer(mGraphics->GetRenderer(), Graphics::WINDOW_WIDTH, Graphics::WINDOW_HEIGHT);
 	
+	// Initialize GUI
+	mGUIManager = new GUIManager();
+	if (!mGUIManager->Initialize(mGraphics->GetWindow(), mGraphics->GetRenderer())) {
+		printf("Failed to initialize GUI!\n");
+		delete mGUIManager;
+		mGUIManager = nullptr;
+	}
+	
 	// Setup camera
 	mCamera = new Camera();
 	mCamera->setPerspective(60.0f, (float)Graphics::WINDOW_WIDTH / Graphics::WINDOW_HEIGHT, 0.1f, 100.0f);
@@ -78,6 +86,7 @@ GameManager::~GameManager()
 {
 	delete mCube;
 	delete mCamera;
+	delete mGUIManager;
 	Graphics::Release();
 	mGraphics = NULL;
 	Timer::Release();
@@ -103,6 +112,11 @@ void GameManager::Run()
 			{
 				mQuit = true;
 			}
+			
+			// Pass events to GUI
+			if (mGUIManager) {
+				mGUIManager->ProcessEvent(mEvents);
+			}
 		}
 		if (mTimer->DeltaTime() > 1.0f / FRAME_RATE)
 		{
@@ -123,16 +137,58 @@ void GameManager::Run()
 			// Update rotation
 			mRotation += 1.0f;
 			
+			// Start GUI frame
+			if (mGUIManager) {
+				mGUIManager->BeginFrame();
+			}
+			
 			// Clear framebuffer
 			mRenderer->Clear(Framebuffer::Color(30, 30, 30)); // Dark gray background
 			
-			// Set culling mode to back-face culling
-			mRenderer->SetCullMode(CullMode::BACK);
+			// Apply GUI settings
+			// Cull mode
+			switch (mRenderSettings.cullMode) {
+				case 0: mRenderer->SetCullMode(CullMode::NONE); break;
+				case 1: mRenderer->SetCullMode(CullMode::BACK); break;
+				case 2: mRenderer->SetCullMode(CullMode::FRONT); break;
+			}
 			
-			// Enable fragment shader for textured rendering
-			// Toggle comment to see colored cube without textures
-			mRenderer->SetFragmentShader(mTexturedShader);
-			// mRenderer->SetFragmentShader(nullptr);
+			// Fill mode
+			switch (mRenderSettings.fillMode) {
+				case 0: mRenderer->SetFillMode(FillMode::SOLID); break;
+				case 1: mRenderer->SetFillMode(FillMode::WIREFRAME); break;
+				case 2: mRenderer->SetFillMode(FillMode::POINT); break;
+			}
+			
+			// Texture settings
+			if (mRenderSettings.enableTextures) {
+				mRenderer->SetFragmentShader(mTexturedShader);
+				
+				// Update texture filter
+				if (mTestTexture) {
+					switch (mRenderSettings.textureFilter) {
+						case 0: mTestTexture->SetFilter(TextureFilter::NEAREST); break;
+						case 1: mTestTexture->SetFilter(TextureFilter::BILINEAR); break;
+						case 2: mTestTexture->SetFilter(TextureFilter::TRILINEAR); break;
+					}
+				}
+			} else {
+				mRenderer->SetFragmentShader(nullptr);
+			}
+			
+			// Rasterization algorithm
+			switch (mRenderSettings.rasterAlgorithm) {
+				case 0: mRenderer->SetRasterizationAlgorithm(Rasterizer::Algorithm::SCANLINE); break;
+				case 1: mRenderer->SetRasterizationAlgorithm(Rasterizer::Algorithm::EDGE_EQUATION); break;
+				case 2: mRenderer->SetRasterizationAlgorithm(Rasterizer::Algorithm::HIERARCHICAL); break;
+			}
+			
+			// Other settings
+			mRenderer->SetDepthTest(mRenderSettings.enableDepthTest);
+			mRenderer->SetScissorTest(mRenderSettings.enableScissor);
+			if (mRenderSettings.enableScissor) {
+				mRenderer->SetScissorRect(100, 100, Graphics::WINDOW_WIDTH - 100, Graphics::WINDOW_HEIGHT - 100);
+			}
 			
 			// Test scissor rect (uncomment to test scissor functionality)
 			// mRenderer->SetScissorTest(true);
@@ -204,19 +260,45 @@ void GameManager::Run()
 			mRenderer->DrawVertexMesh(coloredCubeVertices, coloredCubeIndices,
 				mCube->GetWorldMatrix(), false);
 			
-			// Draw face normals for visualization (cyan color, from triangle centers)
-			mRenderer->DrawFaceNormals(coloredCubeVertices, coloredCubeIndices, mCube->GetWorldMatrix(), 0.5f, Framebuffer::Color(0, 255, 255));
+			// Draw normals based on GUI settings
+			if (mRenderSettings.showNormals) {
+				// Draw face normals (cyan color, from triangle centers)
+				mRenderer->DrawFaceNormals(coloredCubeVertices, coloredCubeIndices, 
+					mCube->GetWorldMatrix(), mRenderSettings.normalLength, 
+					Framebuffer::Color(0, 255, 255));
+			}
 			
-			// Optionally also draw vertex normals (yellow color, from vertices)
-			// mRenderer->DrawVertexNormals(coloredCubeVertices, mCube->GetWorldMatrix(), 0.3f, Framebuffer::Color(255, 255, 0));
+			if (mRenderSettings.showVertexNormals) {
+				// Draw vertex normals (yellow color, from vertices)
+				mRenderer->DrawVertexNormals(coloredCubeVertices, 
+					mCube->GetWorldMatrix(), mRenderSettings.normalLength * 0.7f, 
+					Framebuffer::Color(255, 255, 0));
+			}
 			
-			// Draw FPS counter
-			char fpsText[32];
-			snprintf(fpsText, sizeof(fpsText), "FPS: %.1f", mFPS);
-			mRenderer->DrawText(fpsText, 10, 10, Framebuffer::Color(255, 255, 0));
+			// Draw wireframe overlay if enabled
+			if (mRenderSettings.showWireframe && mRenderSettings.fillMode == 0) {
+				mRenderer->SetFillMode(FillMode::WIREFRAME);
+				mRenderer->DrawVertexMesh(coloredCubeVertices, coloredCubeIndices,
+					mCube->GetWorldMatrix(), true);
+				mRenderer->SetFillMode(FillMode::SOLID);
+			}
+			
+			// Draw FPS counter if enabled
+			if (mRenderSettings.showFPS) {
+				char fpsText[32];
+				snprintf(fpsText, sizeof(fpsText), "FPS: %.1f", mFPS);
+				mRenderer->DrawText(fpsText, 10, 10, Framebuffer::Color(255, 255, 0));
+			}
 			
 			// Present framebuffer to screen
 			mRenderer->Present();
+			
+			// Draw GUI on top
+			if (mGUIManager) {
+				mGUIManager->DrawControlPanel(mRenderSettings);
+				mGUIManager->EndFrame(mGraphics->GetRenderer());
+			}
+			
 			mGraphics->Render();
 			mTimer->Reset();
 		}

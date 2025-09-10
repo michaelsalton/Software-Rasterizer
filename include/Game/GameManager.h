@@ -4,6 +4,7 @@
 #include "Utils/Timer.h"
 #include "Game/Entity.h"
 #include "Graphics/Renderer.h"
+#include "GUI/GUIManager.h"
 #include <memory>
 
 class GameManager
@@ -34,6 +35,10 @@ private:
 	// Texture demo
 	std::shared_ptr<class Texture> mTestTexture;
 	std::shared_ptr<class TexturedFragmentShader> mTexturedShader;
+	
+	// GUI
+	GUIManager* mGUIManager;
+	RenderSettings mRenderSettings;
 
 public:
 	static void Release();

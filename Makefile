@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude -Ithird_party/stb `pkg-config --cflags sdl3`
+CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude -Ithird_party/stb -Ithird_party/imgui -Ithird_party/imgui/backends `pkg-config --cflags sdl3`
 LDFLAGS = `pkg-config --libs sdl3`
 
 # Directories
@@ -26,7 +26,14 @@ SRCS = $(SRC_DIR)/Core/Main.cpp \
        $(SRC_DIR)/Game/GameManager.cpp \
        $(SRC_DIR)/Game/Entity.cpp \
        $(SRC_DIR)/Utils/Timer.cpp \
-       $(SRC_DIR)/Utils/InputManager.cpp
+       $(SRC_DIR)/Utils/InputManager.cpp \
+       $(SRC_DIR)/GUI/GUIManager.cpp \
+       $(SRC_DIR)/GUI/imgui.cpp \
+       $(SRC_DIR)/GUI/imgui_draw.cpp \
+       $(SRC_DIR)/GUI/imgui_tables.cpp \
+       $(SRC_DIR)/GUI/imgui_widgets.cpp \
+       $(SRC_DIR)/GUI/imgui_impl_sdl3.cpp \
+       $(SRC_DIR)/GUI/imgui_impl_sdlrenderer3.cpp
 
 # Object files with build directory prefix
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))

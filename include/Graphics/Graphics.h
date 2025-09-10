@@ -25,6 +25,7 @@ public:
 	static void Release();
 	static bool IsIntitialized();
 
+	SDL_Window* GetWindow();
 	SDL_Renderer* GetRenderer();
 	SDL_Texture* LoadTexture(std::string path);
 	void ClearBackBuffer();

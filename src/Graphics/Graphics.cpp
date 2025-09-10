@@ -33,6 +33,11 @@ void Graphics::Release()
 	sInitialized = false;
 }
 
+SDL_Window* Graphics::GetWindow()
+{
+	return mWindow;
+}
+
 SDL_Renderer* Graphics::GetRenderer()
 {
 	return mRenderer;
