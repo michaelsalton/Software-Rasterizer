@@ -3,8 +3,8 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
-#include "Math/vec3.h"
-#include "Math/vec4.h"
+#include "math/vec3.h"
+#include "math/vec4.h"
 
 // 4x4 Matrix class for 3D transformations
 // Using column-major order (OpenGL convention)

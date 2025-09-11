@@ -1,4 +1,4 @@
-#include "Graphics/frame_buffer.h"
+#include "graphics/frame_buffer.h"
 #include <cmath>
 
 // Color implementation

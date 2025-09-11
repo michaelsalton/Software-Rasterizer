@@ -1,4 +1,4 @@
-#include "Graphics/texture.h"
+#include "rendering/texture.h"
 #include <memory>
 
 namespace TextureGenerator {

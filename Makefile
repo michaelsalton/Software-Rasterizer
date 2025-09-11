@@ -8,34 +8,34 @@ BUILD_DIR = build
 TEST_BUILD_DIR = build/tests
 
 # Source files
-SRCS = $(SRC_DIR)/Core/main.cpp \
-       $(SRC_DIR)/Core/transform.cpp \
-       $(SRC_DIR)/Core/camera.cpp \
-       $(SRC_DIR)/Core/camera_controller.cpp \
-       $(SRC_DIR)/Graphics/graphics.cpp \
-       $(SRC_DIR)/Graphics/renderer.cpp \
-       $(SRC_DIR)/Graphics/frame_buffer.cpp \
-       $(SRC_DIR)/Graphics/vertex.cpp \
-       $(SRC_DIR)/Graphics/vertex_shader.cpp \
-       $(SRC_DIR)/Graphics/clipper.cpp \
-       $(SRC_DIR)/Graphics/primitive_assembler.cpp \
-       $(SRC_DIR)/Graphics/rasterizer.cpp \
-       $(SRC_DIR)/Graphics/bitmap_font.cpp \
-       $(SRC_DIR)/Graphics/texture.cpp \
-       $(SRC_DIR)/Graphics/fragment_shader.cpp \
-       $(SRC_DIR)/Graphics/texture_generator.cpp \
-       $(SRC_DIR)/Lighting/light.cpp \
-       $(SRC_DIR)/Game/game_manager.cpp \
-       $(SRC_DIR)/Game/entity.cpp \
-       $(SRC_DIR)/Utils/timer.cpp \
-       $(SRC_DIR)/Utils/input_manager.cpp \
-       $(SRC_DIR)/GUI/gui_manager.cpp \
-       $(SRC_DIR)/GUI/imgui.cpp \
-       $(SRC_DIR)/GUI/imgui_draw.cpp \
-       $(SRC_DIR)/GUI/imgui_tables.cpp \
-       $(SRC_DIR)/GUI/imgui_widgets.cpp \
-       $(SRC_DIR)/GUI/imgui_impl_sdl3.cpp \
-       $(SRC_DIR)/GUI/imgui_impl_sdlrenderer3.cpp
+SRCS = $(SRC_DIR)/core/main.cpp \
+       $(SRC_DIR)/core/transform.cpp \
+       $(SRC_DIR)/core/camera.cpp \
+       $(SRC_DIR)/core/camera_controller.cpp \
+       $(SRC_DIR)/pipeline/vertex_processor.cpp \
+       $(SRC_DIR)/pipeline/vertex_shader.cpp \
+       $(SRC_DIR)/pipeline/primitive_assembler.cpp \
+       $(SRC_DIR)/pipeline/clipper.cpp \
+       $(SRC_DIR)/pipeline/rasterizer.cpp \
+       $(SRC_DIR)/pipeline/fragment_shader.cpp \
+       $(SRC_DIR)/rendering/renderer.cpp \
+       $(SRC_DIR)/rendering/texture.cpp \
+       $(SRC_DIR)/graphics/graphics_context.cpp \
+       $(SRC_DIR)/graphics/frame_buffer.cpp \
+       $(SRC_DIR)/graphics/bitmap_font.cpp \
+       $(SRC_DIR)/graphics/texture_generator.cpp \
+       $(SRC_DIR)/lighting/light.cpp \
+       $(SRC_DIR)/scene/entity.cpp \
+       $(SRC_DIR)/game/game_manager.cpp \
+       $(SRC_DIR)/utils/timer.cpp \
+       $(SRC_DIR)/utils/input_manager.cpp \
+       $(SRC_DIR)/ui/ui_manager.cpp \
+       $(SRC_DIR)/ui/imgui.cpp \
+       $(SRC_DIR)/ui/imgui_draw.cpp \
+       $(SRC_DIR)/ui/imgui_tables.cpp \
+       $(SRC_DIR)/ui/imgui_widgets.cpp \
+       $(SRC_DIR)/ui/imgui_impl_sdl3.cpp \
+       $(SRC_DIR)/ui/imgui_impl_sdlrenderer3.cpp
 
 # Object files with build directory prefix
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))

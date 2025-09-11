@@ -1,6 +1,6 @@
 #include "../test_framework.h"
-#include "Math/vec4.h"
-#include "Math/vec3.h"
+#include "math/vec4.h"
+#include "math/vec3.h"
 
 void testVec4() {
     TEST_SUITE("Vec4");

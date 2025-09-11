@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Math/vec3.h"
-#include "Math/math.h"
-#include "Lighting/light.h"
-#include "Lighting/material.h"
+#include "math/vec3.h"
+#include "math/math.h"
+#include "lighting/light.h"
+#include "rendering/material.h"
 #include <vector>
 #include <memory>
 #include <algorithm>

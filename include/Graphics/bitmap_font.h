@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "Graphics/frame_buffer.h"
+#include "graphics/frame_buffer.h"
 
 class BitmapFont {
 public:

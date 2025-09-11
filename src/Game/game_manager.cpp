@@ -1,14 +1,14 @@
-#include "Game/game_manager.h"
-#include "Math/vec3.h"
-#include "Math/math.h"
-#include "Core/camera.h"
-#include "Graphics/vertex.h"
-#include "Graphics/vertex_shader.h"
-#include "Graphics/fragment_shader.h"
-#include "Graphics/texture.h"
-#include "Graphics/texture_generator.h"
-#include "Lighting/light.h"
-#include "Lighting/material.h"
+#include "game/game_manager.h"
+#include "math/vec3.h"
+#include "math/math.h"
+#include "core/camera.h"
+#include "pipeline/vertex_processor.h"
+#include "pipeline/vertex_shader.h"
+#include "pipeline/fragment_shader.h"
+#include "rendering/texture.h"
+#include "graphics/texture_generator.h"
+#include "lighting/light.h"
+#include "rendering/material.h"
 #include "imgui.h"
 #include <cmath>
 #include <cstdio>
@@ -27,16 +27,16 @@ GameManager* GameManager::Instance()
 GameManager::GameManager()
 {
 	mQuit = false;
-	mGraphics = Graphics::Instance();
-	if (!Graphics::IsIntitialized())
+	mGraphics = GraphicsContext::Instance();
+	if (!GraphicsContext::IsIntitialized())
 	{
 		mQuit = true;
 	}
 	mTimer = Timer::Instance();
-	mRenderer = new Renderer(mGraphics->GetRenderer(), Graphics::WINDOW_WIDTH, Graphics::WINDOW_HEIGHT);
+	mRenderer = new Renderer(mGraphics->GetRenderer(), GraphicsContext::WINDOW_WIDTH, GraphicsContext::WINDOW_HEIGHT);
 	
 	// Initialize GUI
-	mGUIManager = new GUIManager();
+	mGUIManager = new UIManager();
 	if (!mGUIManager->Initialize(mGraphics->GetWindow(), mGraphics->GetRenderer())) {
 		printf("Failed to initialize GUI!\n");
 		delete mGUIManager;
@@ -45,7 +45,7 @@ GameManager::GameManager()
 	
 	// Setup camera
 	mCamera = new Camera();
-	mCamera->setPerspective(60.0f, (float)Graphics::WINDOW_WIDTH / Graphics::WINDOW_HEIGHT, 0.1f, 100.0f);
+	mCamera->setPerspective(60.0f, (float)GraphicsContext::WINDOW_WIDTH / GraphicsContext::WINDOW_HEIGHT, 0.1f, 100.0f);
 	mCamera->setPosition(0, 0, 5);  // Position camera in front of cube
 	mCamera->lookAt(Vec3(0, 0, 0));  // Look at origin where cube is
 	mRenderer->SetCamera(mCamera);
@@ -151,7 +151,7 @@ GameManager::~GameManager()
 	delete mCameraController;
 	delete mCamera;
 	delete mGUIManager;
-	Graphics::Release();
+	GraphicsContext::Release();
 	mGraphics = NULL;
 	Timer::Release();
 	mTimer = NULL;
@@ -335,12 +335,12 @@ void GameManager::Run()
 			mRenderer->SetDepthTest(mRenderSettings.enableDepthTest);
 			mRenderer->SetScissorTest(mRenderSettings.enableScissor);
 			if (mRenderSettings.enableScissor) {
-				mRenderer->SetScissorRect(100, 100, Graphics::WINDOW_WIDTH - 100, Graphics::WINDOW_HEIGHT - 100);
+				mRenderer->SetScissorRect(100, 100, GraphicsContext::WINDOW_WIDTH - 100, GraphicsContext::WINDOW_HEIGHT - 100);
 			}
 			
 			// Test scissor rect (uncomment to test scissor functionality)
 			// mRenderer->SetScissorTest(true);
-			// mRenderer->SetScissorRect(100, 100, Graphics::WINDOW_WIDTH - 100, Graphics::WINDOW_HEIGHT - 100);
+			// mRenderer->SetScissorRect(100, 100, GraphicsContext::WINDOW_WIDTH - 100, GraphicsContext::WINDOW_HEIGHT - 100);
 			
 			// Test fill mode (uncomment to test wireframe or point modes)
 			// mRenderer->SetFillMode(FillMode::WIREFRAME);

@@ -1,4 +1,4 @@
-#include "Core/camera.h"
+#include "core/camera.h"
 #include <cmath>
 
 Camera::Camera() 

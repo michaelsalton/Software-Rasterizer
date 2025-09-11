@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Graphics/graphics.h"
-#include "Utils/timer.h"
-#include "Game/entity.h"
-#include "Graphics/renderer.h"
-#include "GUI/gui_manager.h"
-#include "Core/camera_controller.h"
+#include "graphics/graphics_context.h"
+#include "utils/timer.h"
+#include "scene/entity.h"
+#include "rendering/renderer.h"
+#include "ui/ui_manager.h"
+#include "core/camera_controller.h"
 #include <memory>
 
 class GameManager
@@ -18,7 +18,7 @@ private:
 	Renderer* mRenderer;
 	const int FRAME_RATE = 60;
 	bool mQuit;
-	Graphics* mGraphics;
+	GraphicsContext* mGraphics;
 	SDL_Event mEvents;
 	Timer* mTimer;
 	
@@ -47,7 +47,7 @@ private:
 	bool mAnimatePointLights;
 	
 	// GUI
-	GUIManager* mGUIManager;
+	UIManager* mGUIManager;
 	RenderSettings mRenderSettings;
 
 public:

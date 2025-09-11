@@ -1,4 +1,4 @@
-#include "Graphics/bitmap_font.h"
+#include "graphics/bitmap_font.h"
 
 // Simple 8x8 bitmap font data
 const uint8_t BitmapFont::fontData[256][8] = {

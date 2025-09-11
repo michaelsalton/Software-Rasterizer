@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Math/vec3.h"
-#include "Math/mat4.h"
-#include "Math/math.h"
-#include "Core/transform.h"
+#include "math/vec3.h"
+#include "math/mat4.h"
+#include "math/math.h"
+#include "core/transform.h"
 
 class Camera {
 public:
