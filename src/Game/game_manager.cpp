@@ -492,7 +492,15 @@ void GameManager::Run()
 			
 			// Draw GUI on top
 			if (mGUIManager) {
+				// Pass camera capture state to UI
+				bool cameraHasMouse = mCameraController->IsMouseCaptured();
+				mGUIManager->SetInteractionEnabled(!cameraHasMouse);
 				mGUIManager->DrawControlPanel(mRenderSettings);
+				
+				// Draw controls window
+				bool isOrbitMode = (mCameraController->GetControlMode() == CameraController::ORBIT);
+				mGUIManager->DrawControlsWindow(cameraHasMouse, isOrbitMode);
+				
 				mGUIManager->EndFrame(mGraphics->GetRenderer());
 			}
 			

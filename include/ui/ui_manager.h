@@ -58,13 +58,20 @@ public:
     // Render control panel
     void DrawControlPanel(RenderSettings& settings);
     
+    // Render controls help window
+    void DrawControlsWindow(bool cameraActive, bool isOrbitMode);
+    
     // End frame and render
     void EndFrame(SDL_Renderer* renderer);
     
     // Check if mouse is over GUI
     bool IsMouseOverGUI() const;
     
+    // Enable/disable UI interaction
+    void SetInteractionEnabled(bool enabled) { mInteractionEnabled = enabled; }
+    
 private:
     bool mInitialized;
     ImGuiContext* mContext;
+    bool mInteractionEnabled;
 };

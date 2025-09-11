@@ -3,7 +3,7 @@
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
 
-UIManager::UIManager() : mInitialized(false), mContext(nullptr) {
+UIManager::UIManager() : mInitialized(false), mContext(nullptr), mInteractionEnabled(true) {
 }
 
 UIManager::~UIManager() {
@@ -52,7 +52,7 @@ void UIManager::Shutdown() {
 }
 
 void UIManager::ProcessEvent(const SDL_Event& event) {
-    if (mInitialized) {
+    if (mInitialized && mInteractionEnabled) {
         ImGui_ImplSDL3_ProcessEvent(&event);
     }
 }
@@ -68,11 +68,30 @@ void UIManager::BeginFrame() {
 void UIManager::DrawControlPanel(RenderSettings& settings) {
     if (!mInitialized) return;
     
+    // When interaction is disabled, push a disabled style
+    if (!mInteractionEnabled) {
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f); // Make it semi-transparent
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 0.7f, 1.0f));
+    }
+    
     // Create control panel window
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_FirstUseEver);
     
     if (ImGui::Begin("Render Controls", nullptr, ImGuiWindowFlags_NoCollapse)) {
+        // Show camera control instructions
+        if (!mInteractionEnabled) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.2f, 1.0f)); // Yellow
+            ImGui::Text("Camera Mode Active - Press ESC to release");
+            ImGui::PopStyleColor();
+            ImGui::Separator();
+        } else {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 1.0f, 0.7f, 1.0f)); // Light green
+            ImGui::Text("Press E to activate camera control");
+            ImGui::PopStyleColor();
+            ImGui::Separator();
+        }
+        
         // Display options
         if (ImGui::CollapsingHeader("Display", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Checkbox("Show Axis", &settings.showAxis);
@@ -148,6 +167,12 @@ void UIManager::DrawControlPanel(RenderSettings& settings) {
         
     }
     ImGui::End();
+    
+    // Pop the disabled style if it was pushed
+    if (!mInteractionEnabled) {
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+    }
 }
 
 void UIManager::EndFrame(SDL_Renderer* renderer) {
@@ -157,8 +182,71 @@ void UIManager::EndFrame(SDL_Renderer* renderer) {
     }
 }
 
+void UIManager::DrawControlsWindow(bool cameraActive, bool isOrbitMode) {
+    if (!mInitialized) return;
+    
+    // Position window in bottom right corner
+    ImGuiIO& io = ImGui::GetIO();
+    float windowWidth = 250.0f;
+    float windowHeight = cameraActive ? 180.0f : 120.0f;
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - windowWidth - 10, 
+                                  io.DisplaySize.y - windowHeight - 10), 
+                           ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight), ImGuiCond_Always);
+    
+    // Make the window non-interactive and semi-transparent
+    ImGui::SetNextWindowBgAlpha(0.8f);
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | 
+                                  ImGuiWindowFlags_NoResize | 
+                                  ImGuiWindowFlags_NoMove | 
+                                  ImGuiWindowFlags_NoScrollbar | 
+                                  ImGuiWindowFlags_NoCollapse |
+                                  ImGuiWindowFlags_NoFocusOnAppearing |
+                                  ImGuiWindowFlags_NoNav;
+    
+    if (ImGui::Begin("##Controls", nullptr, windowFlags)) {
+        ImGui::Text("Controls");
+        ImGui::Separator();
+        
+        if (cameraActive) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.9f, 0.5f, 1.0f)); // Yellow
+            ImGui::Text("Camera Mode Active");
+            ImGui::PopStyleColor();
+            ImGui::Spacing();
+            
+            if (isOrbitMode) {
+                ImGui::Text("Mouse: Rotate camera");
+                ImGui::Text("W/S: Zoom in/out");
+                ImGui::Text("Mouse Wheel: Zoom");
+            } else {
+                ImGui::Text("Mouse: Look around");
+                ImGui::Text("W: Move forward");
+                ImGui::Text("S: Move backward");
+                ImGui::Text("A: Strafe left");
+                ImGui::Text("D: Strafe right");
+            }
+            ImGui::Spacing();
+            ImGui::Text("ESC: Release camera");
+        } else {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 1.0f, 0.5f, 1.0f)); // Green
+            ImGui::Text("UI Mode Active");
+            ImGui::PopStyleColor();
+            ImGui::Spacing();
+            
+            ImGui::Text("E: Activate camera");
+            ImGui::Text("Mouse: Interact with UI");
+        }
+        
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Text("R: Toggle cube rotation");
+        ImGui::Text("C: Switch camera mode");
+    }
+    ImGui::End();
+}
+
 bool UIManager::IsMouseOverGUI() const {
-    if (!mInitialized) return false;
+    if (!mInitialized || !mInteractionEnabled) return false;
     ImGuiIO& io = ImGui::GetIO();
     return io.WantCaptureMouse;
 }
