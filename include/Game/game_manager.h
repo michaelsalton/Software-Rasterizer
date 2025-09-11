@@ -42,7 +42,9 @@ private:
 	// Lighting demo
 	std::shared_ptr<class LitFragmentShader> mLitShader;
 	std::shared_ptr<class DirectionalLight> mSunLight;
+	std::vector<std::shared_ptr<class PointLight>> mPointLights;
 	float mLightAngle;
+	bool mAnimatePointLights;
 	
 	// GUI
 	GUIManager* mGUIManager;

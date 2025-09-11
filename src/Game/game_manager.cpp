@@ -1,5 +1,6 @@
 #include "Game/game_manager.h"
 #include "Math/vec3.h"
+#include "Math/math.h"
 #include "Core/camera.h"
 #include "Graphics/vertex.h"
 #include "Graphics/vertex_shader.h"
@@ -102,14 +103,46 @@ GameManager::GameManager()
 	mSunLight = std::make_shared<DirectionalLight>(
 		Vec3(0, -1, -1).normalized(),  // Direction the light is shining
 		Vec3(1.0f, 0.95f, 0.8f),      // Warm white color
-		1.0f                          // Full intensity
+		0.5f                          // Reduced intensity for multi-light setup
 	);
 	mLitShader->AddLight(mSunLight);
 	
-	// Set ambient light
-	mLitShader->SetAmbientLight(Vec3(0.2f, 0.2f, 0.25f)); // Slightly blue ambient
+	// Create point lights
+	// Red point light on the left
+	auto redLight = std::make_shared<PointLight>(
+		Vec3(-2.0f, 0.0f, 2.0f),   // Position
+		Vec3(1.0f, 0.2f, 0.2f),    // Red color
+		2.0f,                      // Intensity
+		1.0f, 0.35f, 0.44f         // Attenuation (constant, linear, quadratic)
+	);
+	mPointLights.push_back(redLight);
+	mLitShader->AddLight(redLight);
+	
+	// Green point light on the right
+	auto greenLight = std::make_shared<PointLight>(
+		Vec3(2.0f, 0.0f, 2.0f),    // Position
+		Vec3(0.2f, 1.0f, 0.2f),    // Green color
+		2.0f,                      // Intensity
+		1.0f, 0.35f, 0.44f         // Attenuation
+	);
+	mPointLights.push_back(greenLight);
+	mLitShader->AddLight(greenLight);
+	
+	// Blue point light above
+	auto blueLight = std::make_shared<PointLight>(
+		Vec3(0.0f, 2.0f, 0.0f),    // Position
+		Vec3(0.2f, 0.2f, 1.0f),    // Blue color
+		2.0f,                      // Intensity
+		1.0f, 0.35f, 0.44f         // Attenuation
+	);
+	mPointLights.push_back(blueLight);
+	mLitShader->AddLight(blueLight);
+	
+	// Set ambient light (reduced for better light contrast)
+	mLitShader->SetAmbientLight(Vec3(0.1f, 0.1f, 0.12f)); // Slightly blue ambient
 	
 	mLightAngle = 0.0f;
+	mAnimatePointLights = false;
 }
 
 GameManager::~GameManager()
@@ -199,6 +232,40 @@ void GameManager::Run()
 				float radians = Math::toRadians(mLightAngle);
 				Vec3 lightDir(sin(radians), -0.7f, cos(radians));
 				mSunLight->setDirection(lightDir.normalized());
+			}
+			
+			// Update point lights
+			if (mRenderSettings.enableLighting && mRenderSettings.showPointLights) {
+				// Enable/disable point lights based on GUI
+				for (auto& light : mPointLights) {
+					light->setEnabled(true);
+					light->setIntensity(mRenderSettings.pointLightIntensity);
+				}
+				
+				// Animate point lights if enabled
+				if (mRenderSettings.animatePointLights) {
+					float time = SDL_GetTicks() / 1000.0f;
+					
+					// Orbit the lights around the cube
+					if (mPointLights.size() >= 3) {
+						// Red light orbits in XZ plane
+						float angle1 = time * 0.5f;
+						mPointLights[0]->setPosition(Vec3(cos(angle1) * 2.0f, 0.0f, sin(angle1) * 2.0f + 2.0f));
+						
+						// Green light orbits in XZ plane (opposite phase)
+						float angle2 = time * 0.5f + Math::PI;
+						mPointLights[1]->setPosition(Vec3(cos(angle2) * 2.0f, 0.0f, sin(angle2) * 2.0f + 2.0f));
+						
+						// Blue light moves up and down
+						float height = sin(time * 2.0f) * 1.0f + 1.0f;
+						mPointLights[2]->setPosition(Vec3(0.0f, height, 0.0f));
+					}
+				}
+			} else {
+				// Disable point lights when not shown
+				for (auto& light : mPointLights) {
+					light->setEnabled(false);
+				}
 			}
 			
 			// Update shader material based on GUI settings

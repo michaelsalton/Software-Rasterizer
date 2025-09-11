@@ -23,6 +23,9 @@ struct RenderSettings {
     bool enableLighting = true;
     bool animateLight = true;
     int shadingModel = 0; // 0=Phong, 1=Blinn-Phong, 2=Lambert
+    bool showPointLights = true;
+    bool animatePointLights = false;
+    float pointLightIntensity = 2.0f;
     
     // Debug options
     bool enableDepthTest = true;

@@ -105,10 +105,17 @@ void GUIManager::DrawControlPanel(RenderSettings& settings) {
             ImGui::Checkbox("Enable Lighting", &settings.enableLighting);
             
             if (settings.enableLighting) {
-                ImGui::Checkbox("Animate Light", &settings.animateLight);
+                ImGui::Checkbox("Animate Directional Light", &settings.animateLight);
                 
                 const char* shadingModels[] = { "Phong", "Blinn-Phong", "Lambert" };
                 ImGui::Combo("Shading Model", &settings.shadingModel, shadingModels, 3);
+                
+                ImGui::Separator();
+                ImGui::Checkbox("Show Point Lights", &settings.showPointLights);
+                if (settings.showPointLights) {
+                    ImGui::Checkbox("Animate Point Lights", &settings.animatePointLights);
+                    ImGui::SliderFloat("Point Light Intensity", &settings.pointLightIntensity, 0.0f, 5.0f);
+                }
             }
         }
         
