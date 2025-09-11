@@ -7,12 +7,12 @@ struct ImGuiContext;
 
 struct RenderSettings {
     // Display toggles
-    bool showNormals = true;
+    bool showNormals = false;
     bool showVertexNormals = false;
     bool showWireframe = false;
     bool enableTextures = true;
     bool showFPS = true;
-    bool showAxis = true;
+    bool showAxis = false;
     
     // Render modes
     int fillMode = 0; // 0=Solid, 1=Wireframe, 2=Points

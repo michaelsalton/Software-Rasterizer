@@ -57,7 +57,7 @@ GameManager::GameManager()
 	// Create demo cube
 	mCube = new Entity();
 	mRotation = 0.0f;
-	mRotateCube = true;
+	mRotateCube = false;
 	
 	// Initialize FPS tracking
 	mFPS = 60.0f;  // Start with expected FPS
