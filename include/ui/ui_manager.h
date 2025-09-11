@@ -26,6 +26,9 @@ struct RenderSettings {
     bool showPointLights = true;
     bool animatePointLights = false;
     float pointLightIntensity = 2.0f;
+    bool showSpotLight = true;
+    bool animateSpotLight = false;
+    float spotLightAngle = 0.0f;
     
     // Debug options
     bool enableDepthTest = true;

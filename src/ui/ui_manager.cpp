@@ -116,6 +116,15 @@ void UIManager::DrawControlPanel(RenderSettings& settings) {
                     ImGui::Checkbox("Animate Point Lights", &settings.animatePointLights);
                     ImGui::SliderFloat("Point Light Intensity", &settings.pointLightIntensity, 0.0f, 5.0f);
                 }
+                
+                ImGui::Separator();
+                ImGui::Checkbox("Show Spot Light", &settings.showSpotLight);
+                if (settings.showSpotLight) {
+                    ImGui::Checkbox("Animate Spot Light", &settings.animateSpotLight);
+                    if (settings.animateSpotLight) {
+                        ImGui::SliderFloat("Spot Light Angle", &settings.spotLightAngle, 0.0f, 360.0f);
+                    }
+                }
             }
         }
         

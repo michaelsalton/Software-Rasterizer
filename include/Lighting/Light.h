@@ -96,3 +96,50 @@ public:
     float getAttenuation(const Vec3& worldPos) const override;
     Vec3 getLightContribution(const Vec3& worldPos) const override;
 };
+
+// Spot light (flashlight, stage light, etc)
+class SpotLight : public Light {
+private:
+    Vec3 position;
+    Vec3 direction;  // Direction the spotlight is pointing
+    
+    // Attenuation parameters (same as point light)
+    float attenuationConstant;
+    float attenuationLinear;
+    float attenuationQuadratic;
+    float range;
+    
+    // Spotlight cone parameters
+    float innerConeAngle;  // Inner cone angle in radians (full intensity)
+    float outerConeAngle;  // Outer cone angle in radians (falloff to zero)
+    float cosInnerCone;    // Precomputed cos of inner angle
+    float cosOuterCone;    // Precomputed cos of outer angle
+    
+    // Calculate effective range based on attenuation
+    float calculateRange() const;
+    
+public:
+    SpotLight(const Vec3& position, const Vec3& direction,
+              float innerAngleDeg, float outerAngleDeg,
+              const Vec3& color = Vec3(1, 1, 1), float intensity = 1.0f,
+              float constant = 1.0f, float linear = 0.09f, float quadratic = 0.032f);
+    
+    // Spotlight specific methods
+    void setPosition(const Vec3& pos) { position = pos; }
+    void setDirection(const Vec3& dir);
+    void setConeAngles(float innerDeg, float outerDeg);
+    
+    Vec3 getPosition() const { return position; }
+    Vec3 getDirection() const { return direction; }
+    float getInnerAngle() const { return innerConeAngle; }
+    float getOuterAngle() const { return outerConeAngle; }
+    float getRange() const { return range; }
+    
+    // Set attenuation parameters
+    void setAttenuation(float constant, float linear, float quadratic);
+    
+    // Light interface implementation
+    Vec3 getDirectionToLight(const Vec3& worldPos) const override;
+    float getAttenuation(const Vec3& worldPos) const override;
+    Vec3 getLightContribution(const Vec3& worldPos) const override;
+};

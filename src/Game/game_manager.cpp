@@ -138,6 +138,18 @@ GameManager::GameManager()
 	mPointLights.push_back(blueLight);
 	mLitShader->AddLight(blueLight);
 	
+	// Create a spotlight (like a flashlight)
+	mSpotLight = std::make_shared<SpotLight>(
+		Vec3(0.0f, 3.0f, 3.0f),    // Position: above and in front
+		Vec3(0.0f, -0.7f, -0.7f).normalized(),  // Direction: pointing down at cube
+		15.0f,                      // Inner cone angle (degrees)
+		30.0f,                      // Outer cone angle (degrees)
+		Vec3(1.0f, 0.9f, 0.7f),    // Warm white color
+		3.0f,                      // Intensity
+		1.0f, 0.09f, 0.032f        // Attenuation
+	);
+	mLitShader->AddLight(mSpotLight);
+	
 	// Set ambient light (reduced for better light contrast)
 	mLitShader->SetAmbientLight(Vec3(0.1f, 0.1f, 0.12f)); // Slightly blue ambient
 	
@@ -266,6 +278,26 @@ void GameManager::Run()
 				for (auto& light : mPointLights) {
 					light->setEnabled(false);
 				}
+			}
+			
+			// Update spotlight
+			if (mRenderSettings.enableLighting && mRenderSettings.showSpotLight) {
+				mSpotLight->setEnabled(true);
+				
+				// Animate spotlight if enabled
+				if (mRenderSettings.animateSpotLight) {
+					// Rotate spotlight around Y axis
+					float radians = Math::toRadians(mRenderSettings.spotLightAngle);
+					float radius = 4.0f;
+					Vec3 newPos(sin(radians) * radius, 3.0f, cos(radians) * radius);
+					mSpotLight->setPosition(newPos);
+					
+					// Always point at the cube
+					Vec3 toTarget = -newPos.normalized();
+					mSpotLight->setDirection(toTarget);
+				}
+			} else {
+				mSpotLight->setEnabled(false);
 			}
 			
 			// Update shader material based on GUI settings

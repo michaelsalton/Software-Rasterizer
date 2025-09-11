@@ -43,6 +43,7 @@ private:
 	std::shared_ptr<class LitFragmentShader> mLitShader;
 	std::shared_ptr<class DirectionalLight> mSunLight;
 	std::vector<std::shared_ptr<class PointLight>> mPointLights;
+	std::shared_ptr<class SpotLight> mSpotLight;
 	float mLightAngle;
 	bool mAnimatePointLights;
 	
