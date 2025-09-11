@@ -190,12 +190,21 @@ void GameManager::Run()
 			}
 			
 			// Pass events to GUI first (it should have priority)
+			bool guiWantsMouse = false;
 			if (mGUIManager) {
 				mGUIManager->ProcessEvent(mEvents);
+				guiWantsMouse = mGUIManager->IsMouseOverGUI();
 			}
 			
-			// Pass events to camera controller
-			mCameraController->HandleEvent(mEvents);
+			// Only pass mouse events to camera controller if GUI doesn't want them
+			bool isMouseEvent = (mEvents.type == SDL_EVENT_MOUSE_MOTION || 
+			                    mEvents.type == SDL_EVENT_MOUSE_BUTTON_DOWN || 
+			                    mEvents.type == SDL_EVENT_MOUSE_BUTTON_UP ||
+			                    mEvents.type == SDL_EVENT_MOUSE_WHEEL);
+			
+			if (!isMouseEvent || !guiWantsMouse) {
+				mCameraController->HandleEvent(mEvents);
+			}
 			
 			// Toggle cube rotation with R key
 			if (mEvents.type == SDL_EVENT_KEY_DOWN && mEvents.key.key == SDLK_R) {
