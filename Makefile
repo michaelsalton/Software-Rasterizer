@@ -42,7 +42,8 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
 TARGET = SoftwareRasterizer
 
 # Test files
-TEST_SOURCES = tests/Math/vec2_test.cpp tests/Math/vec3_test.cpp tests/Math/vec4_test.cpp tests/Math/mat4_test.cpp
+TEST_SOURCES = tests/Math/vec2_test.cpp tests/Math/vec3_test.cpp tests/Math/vec4_test.cpp tests/Math/mat4_test.cpp \
+               tests/Math/vec3_enhanced_test.cpp
 TEST_OBJECTS = $(patsubst tests/%.cpp,$(TEST_BUILD_DIR)/%.o,$(TEST_SOURCES))
 TEST_RUNNER = tests/RunAllTests
 
@@ -76,7 +77,7 @@ test: $(TEST_RUNNER)
 test-verbose: $(TEST_RUNNER)
 	./$(TEST_RUNNER) -v
 
-$(TEST_RUNNER): $(TEST_BUILD_DIR)/RunAllTests.o $(TEST_OBJECTS)
+$(TEST_RUNNER): $(TEST_BUILD_DIR)/run_all_tests.o $(TEST_OBJECTS)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 # Pattern rule for test object files

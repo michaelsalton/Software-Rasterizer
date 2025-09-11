@@ -1,12 +1,14 @@
 #include <iostream>
 #include <cstdlib>
 #include "test_framework.h"
+#include "test_assertions.h"
 
-// Forward declarations for test functions
+// Forward declarations for existing test functions
 void testVec2();
 void testVec3();
 void testVec4();
 void testMat4();
+void testVec3Enhanced();
 
 int main(int argc, char* argv[]) {
     std::cout << "Running Software Rasterizer Test Suite\n";
@@ -27,18 +29,22 @@ int main(int argc, char* argv[]) {
         TestFramework::getInstance().setVerbose(true);
     }
     
-    // Run all test suites
+    // Run existing basic tests
+    std::cout << "\n" << COLOR_YELLOW << "=== Basic Math Tests ===" << COLOR_RESET << "\n";
     testVec2();
     testVec3();
     testVec4();
     testMat4();
     
-    // You can add more test suites here as you create them:
-    // testRenderer();
-    // testEntity();
-    // etc.
+    // Run enhanced tests
+    std::cout << "\n" << COLOR_YELLOW << "=== Enhanced Tests ===" << COLOR_RESET << "\n";
+    testVec3Enhanced();
+    
+    // Note about additional tests
+    std::cout << "\n" << COLOR_YELLOW << "Note: See docs/testing/test_specification.md for the comprehensive test plan." << COLOR_RESET << "\n";
     
     // Print overall summary
+    std::cout << "\n";
     RUN_ALL_TESTS();
     
     return 0;

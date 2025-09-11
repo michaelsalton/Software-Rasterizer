@@ -1,82 +1,73 @@
-# Software Rasterizer Test Framework
+# Software Rasterizer Test Suite
 
 ## Overview
-This test framework provides a simple and effective way to write and run unit tests for the Software Rasterizer project.
+The test suite provides comprehensive testing for all components of the software rasterizer, from basic math operations to complex rendering pipelines.
 
 ## Running Tests
 
-### Run all tests:
+### Basic Usage
 ```bash
-make test
+make test      # Run all tests
+make test-verbose  # Run with detailed output
 ```
 
-### Run tests with verbose output:
-```bash
-make test-verbose
+### Test Framework Features
+
+#### Enhanced Assertions
+The test framework now includes specialized assertions for graphics programming:
+
+- **Vector/Matrix Assertions**: `ASSERT_VEC2_EQ`, `ASSERT_VEC3_EQ`, `ASSERT_VEC4_EQ`, `ASSERT_MAT4_NEAR`
+- **Float Comparison**: `ASSERT_FLOAT_EQ` with epsilon tolerance
+- **Range Validation**: `ASSERT_IN_RANGE(value, min, max)`
+- **Performance Testing**: `ASSERT_PERFORMANCE(code, maxTimeMs)`
+
+#### Benchmarking
+```cpp
+BENCHMARK("Operation name", iterations, {
+    // Code to benchmark
+});
 ```
 
-### Clean test files:
-```bash
-make clean
-```
+## Test Structure
 
-## Writing Tests
+### Current Tests
+- `tests/Math/` - Basic math tests for Vec2, Vec3, Vec4, Mat4
+- `tests/Math/vec3_enhanced_test.cpp` - Example of enhanced testing features
 
-### Basic Test Structure
+### Planned Tests (see `docs/testing/test_specification.md`)
+- Pipeline component tests (vertex processing, clipping, rasterization)
+- Rendering validation tests
+- Performance benchmarks
+- Integration tests
+
+## Example Enhanced Test
 
 ```cpp
-#include "../TestFramework.h"
-#include "YourHeaderFile.h"
+TEST("Vector comparison with custom assertions") {
+    Vec3 v1(1.0f, 2.0f, 3.0f);
+    Vec3 v2(1.0f, 2.0f, 3.0f);
+    
+    ASSERT_VEC3_EQ(v1, v2);  // Exact equality
+    ASSERT_VEC3_NEAR(v1, v2, 0.001f);  // Near equality with epsilon
+});
 
-void testYourClass() {
-    TEST_SUITE("YourClass");
-
-    TEST("Test Name") {
-        // Your test code here
-        ASSERT_TRUE(condition);
-        ASSERT_FLOAT_EQ(expected, actual);
+TEST("Performance benchmark") {
+    BENCHMARK("Vec3 operations", 100000, {
+        Vec3 result = v1.cross(v2);
     });
-
-    TEST("Another Test") {
-        // More test code
-        ASSERT_FALSE(condition);
-        ASSERT_EQ(expected, actual);
-    });
-
-    END_SUITE();
-}
+});
 ```
 
-### Available Assertions
+## Test Coverage Goals
 
-- `ASSERT_TRUE(condition)` - Assert condition is true
-- `ASSERT_FALSE(condition)` - Assert condition is false
-- `ASSERT_EQ(expected, actual)` - Assert values are equal
-- `ASSERT_NE(expected, actual)` - Assert values are not equal
-- `ASSERT_FLOAT_EQ(expected, actual)` - Assert floats are equal (with epsilon)
-- `ASSERT_THROWS(ExceptionType, function)` - Assert function throws specific exception
-- `ASSERT_NO_THROW(function)` - Assert function doesn't throw
+- Unit test coverage: >80%
+- Critical path coverage: 100%
+- Performance regression detection
 
-### Adding New Test Files
+## Contributing
 
-1. Create your test file in the appropriate directory (e.g., `tests/Math/MyClassTest.cpp`)
-2. Include the test function declaration in `RunAllTests.cpp`
-3. Add the test file to the `TEST_SOURCES` variable in the Makefile
-4. Call your test function in `main()` of `RunAllTests.cpp`
-
-## Test Output
-
-The framework provides colored output:
-- Green checkmarks (✓) for passing tests
-- Red X marks (✗) for failing tests
-- Summary statistics for each test suite
-- Overall summary at the end
-
-## Features
-
-- Simple macro-based API
-- Execution time tracking
-- Colored console output
-- Verbose mode for detailed results
-- Test suite organization
-- Automatic test discovery within suites
+When adding new tests:
+1. Use the enhanced assertion macros where applicable
+2. Include performance benchmarks for critical operations
+3. Follow the naming convention: `test_<module>_<feature>.cpp`
+4. Update this README with new test locations
