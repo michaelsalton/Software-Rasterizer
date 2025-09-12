@@ -53,8 +53,29 @@ bool OBJLoader::load(const std::string& filepath, Model* outModel) {
             material->shadingModel = Material::LAMBERT;
         }
         
-        // TODO: Load textures referenced by the material
-        // For now, we'll skip texture loading
+        // Load textures referenced by the material
+        if (!mtl.diffuseMap.empty()) {
+            // Extract directory from OBJ filepath
+            std::string directory;
+            size_t lastSlash = filepath.find_last_of("/\\");
+            if (lastSlash != std::string::npos) {
+                directory = filepath.substr(0, lastSlash);
+            } else {
+                directory = ".";
+            }
+            
+            std::string texturePath = directory + "/" + mtl.diffuseMap;
+            try {
+                auto texture = std::make_shared<Texture>(texturePath);
+                // Store texture in model
+                outModel->addTexture(mtl.diffuseMap, texture);
+                // Set material to use this texture (texture index 0)
+                material->albedoTexture = 0;
+                std::cout << "  Loaded texture: " << texturePath << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "  Failed to load texture " << texturePath << ": " << e.what() << std::endl;
+            }
+        }
         
         outModel->addMaterial(material);
     }

@@ -72,15 +72,9 @@ GameManager::GameManager()
 	// mTestTexture = TextureGenerator::CreateGradient(256, 256);
 	// mTestTexture = TextureGenerator::CreateDebugGrid(256, 32);
 	
-	// Load texture from file
-	try {
-		mTestTexture = std::make_shared<Texture>("assets/textures/metal.jpg");
-		printf("Loaded texture from file!\n");
-	} catch (const std::exception& e) {
-		printf("Failed to load texture: %s\n", e.what());
-		printf("Using procedural texture instead.\n");
-		mTestTexture = TextureGenerator::CreateDebugGrid(256, 32);
-	}
+	// Create a default procedural texture for objects without textures
+	mTestTexture = TextureGenerator::CreateDebugGrid(256, 32);
+	printf("Using procedural texture for default objects.\n");
 	
 	mTestTexture->SetFilter(TextureFilter::BILINEAR);
 	mTestTexture->SetWrapU(TextureWrap::REPEAT);
@@ -157,9 +151,12 @@ GameManager::GameManager()
 	mLightAngle = 0.0f;
 	mAnimatePointLights = false;
 	
+	// Enable textures to use the skull texture
+	mRenderSettings.enableTextures = true;
+	
 	// Load a test model
 	mLoadedModel = std::make_shared<Model>();
-	if (mLoadedModel->loadFromFile("assets/models/skull.obj")) {
+	if (mLoadedModel->loadFromFile("assets/models/skull/12140_Skull_v3_L2.obj")) {
 		printf("Successfully loaded skull.obj model!\n");
 		printf("Model stats: %zu vertices, %zu triangles\n", 
 			mLoadedModel->getVertexCount(), mLoadedModel->getTriangleCount());

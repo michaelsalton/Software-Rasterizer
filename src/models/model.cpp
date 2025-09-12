@@ -1,6 +1,7 @@
 #include "models/model.h"
 #include "rendering/renderer.h"
 #include "loaders/obj_loader.h"
+#include "pipeline/fragment_shader.h"
 #include <iostream>
 #include <algorithm>
 
@@ -99,11 +100,25 @@ void Model::draw(Renderer* renderer, const Mat4& transform) {
         // Get the material for this submesh
         Material* material = getMaterial(submesh.materialIndex);
         
-        // Set the material on the renderer (if we have one)
+        // Set the material and texture on the renderer (if we have one)
         if (material && renderer->GetFragmentShader()) {
-            // If the fragment shader is a LitFragmentShader, we can set the material
-            // This will be type-checked and handled by the renderer
-            // For now, we'll just draw with whatever shader is currently set
+            // If we have a texture for this material, set it
+            if (!mTextures.empty()) {
+                // Get the first texture (in this case, the diffuse map)
+                auto textureIt = mTextures.begin();
+                if (textureIt->second) {
+                    // Try to set the texture on the shader
+                    auto texturedShader = dynamic_cast<TexturedFragmentShader*>(renderer->GetFragmentShader().get());
+                    if (texturedShader) {
+                        texturedShader->SetTexture(textureIt->second.get());
+                    }
+                    
+                    auto litShader = dynamic_cast<LitFragmentShader*>(renderer->GetFragmentShader().get());
+                    if (litShader) {
+                        litShader->SetAlbedoTexture(textureIt->second.get());
+                    }
+                }
+            }
         }
         
         // Draw the submesh
