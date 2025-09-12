@@ -69,7 +69,7 @@ bool OBJLoader::load(const std::string& filepath, Model* outModel) {
     std::cout << "  Triangles: " << mesh->getTotalTriangleCount() << std::endl;
     std::cout << "  Materials: " << outModel->getMaterialCount() << std::endl;
     
-    // Debug: print first few vertices
+    // Debug: print first few vertices and indices
     if (mesh->getSubMeshCount() > 0) {
         const auto& submesh = mesh->getSubMesh(0);
         std::cout << "  First 8 vertices:" << std::endl;
@@ -78,6 +78,14 @@ bool OBJLoader::load(const std::string& filepath, Model* outModel) {
             std::cout << "    V" << i << ": pos(" << v.position.x << ", " << v.position.y 
                       << ", " << v.position.z << ") norm(" << v.normal.x << ", " 
                       << v.normal.y << ", " << v.normal.z << ")" << std::endl;
+        }
+        
+        // Debug: print first few triangles
+        std::cout << "  First 4 triangles (indices):" << std::endl;
+        for (size_t i = 0; i < std::min(size_t(12), submesh.indices.size()); i += 3) {
+            std::cout << "    Triangle " << i/3 << ": [" << submesh.indices[i] 
+                      << ", " << submesh.indices[i+1] 
+                      << ", " << submesh.indices[i+2] << "]" << std::endl;
         }
     }
     
