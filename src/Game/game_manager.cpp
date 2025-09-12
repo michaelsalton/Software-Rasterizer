@@ -47,8 +47,8 @@ GameManager::GameManager()
 	// Setup camera
 	mCamera = new Camera();
 	mCamera->setPerspective(60.0f, (float)GraphicsContext::WINDOW_WIDTH / GraphicsContext::WINDOW_HEIGHT, 0.1f, 100.0f);
-	mCamera->setPosition(0, 0, 5);  // Position camera in front of cube
-	mCamera->lookAt(Vec3(0, 0, 0));  // Look at origin where cube is
+	mCamera->setPosition(0, 0, 30);  // Move camera back to see the skull better
+	mCamera->lookAt(Vec3(0, -5, 0));  // Look at skull center (skull is offset)
 	mRenderer->SetCamera(mCamera);
 	
 	// Setup camera controller
@@ -153,6 +153,17 @@ GameManager::GameManager()
 	
 	// Enable textures to use the skull texture
 	mRenderSettings.enableTextures = true;
+	
+	// Performance optimizations for complex models
+	mRenderSettings.enableLighting = false;  // Disable lighting for better performance
+	mRenderSettings.showPointLights = false;
+	mRenderSettings.showSpotLight = false;
+	mRenderSettings.animateLight = false;
+	mRenderSettings.rasterAlgorithm = 0;  // Use scanline for now
+	mRenderSettings.textureFilter = 0;  // Use nearest neighbor filtering for speed
+	mRenderSettings.showFPS = true;  // Show FPS counter to monitor performance
+	mRenderSettings.enableTextures = false;  // Disable textures for maximum performance
+	mRenderSettings.fillMode = 1;  // Wireframe mode for performance testing
 	
 	// Load a test model
 	mLoadedModel = std::make_shared<Model>();
@@ -446,13 +457,20 @@ void GameManager::Run()
 				20, 21, 22,  22, 23, 20
 			};
 			
-			// Update cube transform - position at center
+			// Update transform - scale down skull and center it
 			mCube->GetTransform().setRotation(
 				Math::toRadians(mRotation * 0.7f),
 				Math::toRadians(mRotation),
 				Math::toRadians(mRotation * 0.3f)
 			);
 			mCube->GetTransform().setPosition(0, 0, 0); // Center of screen
+			
+			// Scale down the skull if we're using the loaded model
+			if (mRenderSettings.useLoadedModel && mLoadedModel) {
+				mCube->GetTransform().setScale(0.5f, 0.5f, 0.5f); // Scale to 50%
+			} else {
+				mCube->GetTransform().setScale(1.0f, 1.0f, 1.0f); // Normal scale for cube
+			}
 			
 			// Draw axis if enabled
 			if (mRenderSettings.showAxis) {

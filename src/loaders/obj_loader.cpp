@@ -90,6 +90,31 @@ bool OBJLoader::load(const std::string& filepath, Model* outModel) {
     std::cout << "  Triangles: " << mesh->getTotalTriangleCount() << std::endl;
     std::cout << "  Materials: " << outModel->getMaterialCount() << std::endl;
     
+    // Performance optimization: Decimate mesh if it has too many triangles
+    size_t triangleCount = mesh->getTotalTriangleCount();
+    if (triangleCount > 10000) {
+        std::cout << "  Model has " << triangleCount << " triangles. Decimating for performance..." << std::endl;
+        
+        // Simple decimation: skip every N triangles
+        for (size_t i = 0; i < mesh->getSubMeshCount(); ++i) {
+            Mesh::SubMesh& submesh = const_cast<Mesh::SubMesh&>(mesh->getSubMesh(i));
+            std::vector<uint32_t> newIndices;
+            
+            // Keep every 10th triangle (90% reduction)
+            for (size_t j = 0; j < submesh.indices.size(); j += 3) {
+                if ((j / 3) % 10 == 0) {
+                    newIndices.push_back(submesh.indices[j]);
+                    newIndices.push_back(submesh.indices[j + 1]);
+                    newIndices.push_back(submesh.indices[j + 2]);
+                }
+            }
+            
+            submesh.indices = std::move(newIndices);
+        }
+        
+        std::cout << "  Decimated to " << mesh->getTotalTriangleCount() << " triangles" << std::endl;
+    }
+    
     // Debug: print first few vertices and indices
     if (mesh->getSubMeshCount() > 0) {
         const auto& submesh = mesh->getSubMesh(0);
