@@ -38,6 +38,9 @@ struct RenderSettings {
     
     // Performance
     int rasterAlgorithm = 1; // 0=Scanline, 1=EdgeEquation, 2=Hierarchical
+    
+    // Model loading
+    bool useLoadedModel = true; // Toggle between loaded model and hardcoded cube
 };
 
 class UIManager {

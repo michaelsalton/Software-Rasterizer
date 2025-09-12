@@ -47,6 +47,10 @@ public:
 	void DrawVertexMesh(const std::vector<Vertex>& vertices, const std::vector<int>& indices, const Mat4& modelMatrix = Mat4(), bool wireframe = false);
 	void DrawVertexTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2, const Mat4& modelMatrix = Mat4(), bool wireframe = false);
 	
+	// Model rendering
+	void DrawModel(class Model* model, const Mat4& modelMatrix = Mat4());
+	void DrawMesh(class Mesh* mesh, const Mat4& modelMatrix = Mat4());
+	
 	// Shader-based rendering
 	void SetVertexShader(std::shared_ptr<VertexShader> shader) { vertexShader = shader; }
 	std::shared_ptr<VertexShader> GetVertexShader() { return vertexShader; }

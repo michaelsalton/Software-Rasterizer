@@ -94,6 +94,7 @@ void UIManager::DrawControlPanel(RenderSettings& settings) {
         
         // Display options
         if (ImGui::CollapsingHeader("Display", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::Checkbox("Use Loaded Model", &settings.useLoadedModel);
             ImGui::Checkbox("Show Axis", &settings.showAxis);
             ImGui::Checkbox("Show Face Normals", &settings.showNormals);
             ImGui::Checkbox("Show Vertex Normals", &settings.showVertexNormals);

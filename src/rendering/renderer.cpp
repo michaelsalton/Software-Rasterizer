@@ -1,6 +1,8 @@
 #include "rendering/renderer.h"
 #include "graphics/graphics_context.h"
 #include "graphics/bitmap_font.h"
+#include "models/model.h"
+#include "models/mesh.h"
 #include <algorithm>
 #include <iostream>
 #include <cmath>
@@ -784,6 +786,32 @@ void Renderer::SetScissorRect(int left, int top, int right, int bottom) {
     pipelineState.rasterizer.scissorRect.top = top;
     pipelineState.rasterizer.scissorRect.right = right;
     pipelineState.rasterizer.scissorRect.bottom = bottom;
+}
+
+void Renderer::DrawModel(Model* model, const Mat4& modelMatrix) {
+    if (!model || !model->getMesh()) {
+        return;
+    }
+    
+    // Let the model handle drawing itself
+    model->draw(this, modelMatrix);
+}
+
+void Renderer::DrawMesh(Mesh* mesh, const Mat4& modelMatrix) {
+    if (!mesh) {
+        return;
+    }
+    
+    // Draw each submesh
+    for (size_t i = 0; i < mesh->getSubMeshCount(); ++i) {
+        const Mesh::SubMesh& submesh = mesh->getSubMesh(i);
+        
+        // Convert uint32_t indices to int
+        std::vector<int> intIndices(submesh.indices.begin(), submesh.indices.end());
+        
+        // Draw the submesh using the existing DrawVertexMesh function
+        DrawVertexMesh(submesh.vertices, intIndices, modelMatrix, false);
+    }
 }
 
 void Renderer::DrawText(const std::string& text, int x, int y, const Framebuffer::Color& color) {

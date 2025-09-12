@@ -29,6 +29,9 @@ private:
 	float mRotation;
 	bool mRotateCube;  // Toggle for cube rotation
 	
+	// Model loading demo
+	std::shared_ptr<class Model> mLoadedModel;
+	
 	// FPS tracking
 	float mFPS;
 	float mFrameTime;

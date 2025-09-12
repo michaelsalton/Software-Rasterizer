@@ -26,6 +26,9 @@ SRCS = $(SRC_DIR)/core/main.cpp \
        $(SRC_DIR)/graphics/texture_generator.cpp \
        $(SRC_DIR)/lighting/light.cpp \
        $(SRC_DIR)/scene/entity.cpp \
+       $(SRC_DIR)/models/mesh.cpp \
+       $(SRC_DIR)/models/model.cpp \
+       $(SRC_DIR)/loaders/obj_loader.cpp \
        $(SRC_DIR)/game/game_manager.cpp \
        $(SRC_DIR)/utils/timer.cpp \
        $(SRC_DIR)/utils/input_manager.cpp \

@@ -9,6 +9,7 @@
 #include "graphics/texture_generator.h"
 #include "lighting/light.h"
 #include "rendering/material.h"
+#include "models/model.h"
 #include "imgui.h"
 #include <cmath>
 #include <cstdio>
@@ -155,6 +156,17 @@ GameManager::GameManager()
 	
 	mLightAngle = 0.0f;
 	mAnimatePointLights = false;
+	
+	// Load a test model
+	mLoadedModel = std::make_shared<Model>();
+	if (mLoadedModel->loadFromFile("assets/models/cube.obj")) {
+		printf("Successfully loaded cube.obj model!\n");
+		printf("Model stats: %zu vertices, %zu triangles\n", 
+			mLoadedModel->getVertexCount(), mLoadedModel->getTriangleCount());
+	} else {
+		printf("Failed to load cube.obj model.\n");
+		mLoadedModel = nullptr;
+	}
 }
 
 GameManager::~GameManager()
@@ -451,30 +463,60 @@ void GameManager::Run()
 			}
 			
 			
-			// Draw the colored cube
-			mRenderer->DrawVertexMesh(coloredCubeVertices, coloredCubeIndices,
-				mCube->GetWorldMatrix(), false);
-			
-			// Draw normals based on GUI settings
-			if (mRenderSettings.showNormals) {
-				// Draw face normals (cyan color, from triangle centers)
-				mRenderer->DrawFaceNormals(coloredCubeVertices, coloredCubeIndices, 
-					mCube->GetWorldMatrix(), mRenderSettings.normalLength, 
-					Framebuffer::Color(0, 255, 255));
+			// Draw either the loaded model or the hardcoded cube
+			if (mRenderSettings.useLoadedModel && mLoadedModel) {
+				// Draw the loaded model
+				mRenderer->DrawModel(mLoadedModel.get(), mCube->GetWorldMatrix());
+			} else {
+				// Draw hardcoded cube
+				mRenderer->DrawVertexMesh(coloredCubeVertices, coloredCubeIndices,
+					mCube->GetWorldMatrix(), false);
 			}
 			
-			if (mRenderSettings.showVertexNormals) {
-				// Draw vertex normals (yellow color, from vertices)
-				mRenderer->DrawVertexNormals(coloredCubeVertices, 
-					mCube->GetWorldMatrix(), mRenderSettings.normalLength * 0.7f, 
-					Framebuffer::Color(255, 255, 0));
+			// Draw normals based on GUI settings
+			if (mRenderSettings.useLoadedModel && mLoadedModel && mLoadedModel->getMesh()) {
+				// For loaded models
+				const Mesh* mesh = mLoadedModel->getMesh();
+				for (size_t i = 0; i < mesh->getSubMeshCount(); ++i) {
+					const Mesh::SubMesh& submesh = mesh->getSubMesh(i);
+					std::vector<int> intIndices(submesh.indices.begin(), submesh.indices.end());
+					
+					if (mRenderSettings.showNormals) {
+						mRenderer->DrawFaceNormals(submesh.vertices, intIndices, 
+							mCube->GetWorldMatrix(), mRenderSettings.normalLength, 
+							Framebuffer::Color(0, 255, 255));
+					}
+					
+					if (mRenderSettings.showVertexNormals) {
+						mRenderer->DrawVertexNormals(submesh.vertices, 
+							mCube->GetWorldMatrix(), mRenderSettings.normalLength * 0.7f, 
+							Framebuffer::Color(255, 255, 0));
+					}
+				}
+			} else {
+				// For hardcoded cube
+				if (mRenderSettings.showNormals) {
+					mRenderer->DrawFaceNormals(coloredCubeVertices, coloredCubeIndices, 
+						mCube->GetWorldMatrix(), mRenderSettings.normalLength, 
+						Framebuffer::Color(0, 255, 255));
+				}
+				
+				if (mRenderSettings.showVertexNormals) {
+					mRenderer->DrawVertexNormals(coloredCubeVertices, 
+						mCube->GetWorldMatrix(), mRenderSettings.normalLength * 0.7f, 
+						Framebuffer::Color(255, 255, 0));
+				}
 			}
 			
 			// Draw wireframe overlay if enabled
 			if (mRenderSettings.showWireframe && mRenderSettings.fillMode == 0) {
 				mRenderer->SetFillMode(FillMode::WIREFRAME);
-				mRenderer->DrawVertexMesh(coloredCubeVertices, coloredCubeIndices,
-					mCube->GetWorldMatrix(), true);
+				if (mRenderSettings.useLoadedModel && mLoadedModel) {
+					mRenderer->DrawModel(mLoadedModel.get(), mCube->GetWorldMatrix());
+				} else {
+					mRenderer->DrawVertexMesh(coloredCubeVertices, coloredCubeIndices,
+						mCube->GetWorldMatrix(), true);
+				}
 				mRenderer->SetFillMode(FillMode::SOLID);
 			}
 			
