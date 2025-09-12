@@ -69,6 +69,18 @@ bool OBJLoader::load(const std::string& filepath, Model* outModel) {
     std::cout << "  Triangles: " << mesh->getTotalTriangleCount() << std::endl;
     std::cout << "  Materials: " << outModel->getMaterialCount() << std::endl;
     
+    // Debug: print first few vertices
+    if (mesh->getSubMeshCount() > 0) {
+        const auto& submesh = mesh->getSubMesh(0);
+        std::cout << "  First 8 vertices:" << std::endl;
+        for (size_t i = 0; i < std::min(size_t(8), submesh.vertices.size()); ++i) {
+            const auto& v = submesh.vertices[i];
+            std::cout << "    V" << i << ": pos(" << v.position.x << ", " << v.position.y 
+                      << ", " << v.position.z << ") norm(" << v.normal.x << ", " 
+                      << v.normal.y << ", " << v.normal.z << ")" << std::endl;
+        }
+    }
+    
     return true;
 }
 

@@ -159,7 +159,7 @@ GameManager::GameManager()
 	
 	// Load a test model
 	mLoadedModel = std::make_shared<Model>();
-	if (mLoadedModel->loadFromFile("assets/models/cube.obj")) {
+	if (mLoadedModel->loadFromFile("assets/models/cube_test.obj")) {
 		printf("Successfully loaded cube.obj model!\n");
 		printf("Model stats: %zu vertices, %zu triangles\n", 
 			mLoadedModel->getVertexCount(), mLoadedModel->getTriangleCount());
